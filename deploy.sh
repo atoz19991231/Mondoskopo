@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+BASE="$(cd "$(dirname "$0")" && pwd)"
+TARGET=/var/www/mondoskopo
+test -s "$BASE/public/index.html" || { echo "Missing public/index.html"; exit 1; }
+sudo install -d -m 755 "$TARGET"
+sudo install -d -m 700 /var/backups/mondoskopo
+if [ -f "$TARGET/index.html" ]; then
+  sudo cp -p "$TARGET/index.html" "/var/backups/mondoskopo/index-$(date +%Y%m%d-%H%M%S).html"
+fi
+sudo install -m 644 "$BASE/public/index.html" "$TARGET/index.html"
+echo "Mondoskopo public homepage deployed. No DES files or services changed."
