@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f6f9f7">
+<meta name="description" content="Explore institutions, democracy and societal change across countries and through time.">
+<title>Mondoskopo — Observing humanity in motion</title>
+<style>
+:root{font-family:Inter,system-ui,-apple-system,sans-serif;color:#233b3b;background:#f7f9f8}*{box-sizing:border-box}
+body{margin:0}button{font:inherit;cursor:pointer}button:focus-visible{outline:3px solid #267769;outline-offset:3px}
+.shell{max-width:1140px;margin:0 auto;padding:0 24px}
+header{background:#fff;border-bottom:1px solid #dae5df}
+.top{display:flex;align-items:center;justify-content:space-between;padding:17px 0}
+.brand{display:flex;gap:13px;align-items:center}.brand svg{width:58px;height:58px}
+.brand b{font-size:25px;letter-spacing:-1.3px}.brand span{display:block;font-size:12px;color:#607a73;margin-top:2px}
+.tagh{font-size:12px;color:#56766a}nav{display:flex;gap:6px;flex-wrap:wrap;padding-bottom:14px}
+nav button{border:0;background:transparent;color:#49695f;border-radius:10px;padding:11px 17px}
+nav button[aria-selected=true]{background:#e1efe9;color:#185c50;font-weight:700}
+main{padding-top:26px}.hero{display:grid;grid-template-columns:1.1fr .9fr;gap:30px;align-items:center;padding:48px;border-radius:22px;background:linear-gradient(120deg,#f9fcfa,#e5f1eb);border:1px solid #d9e7df}
+.eyebrow{font-size:11px;font-weight:750;color:#317d69;text-transform:uppercase;letter-spacing:2px}
+h1{font-size:clamp(37px,5.3vw,67px);line-height:1.08;letter-spacing:-3px;margin:22px 0;color:#183631}
+.intro{max-width:530px;line-height:1.75;color:#577269;font-size:16px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:25px}
+.actions button{padding:13px 17px;border-radius:10px;border:1px solid #b9d2c8;background:#fff;color:#185e50;font-weight:700}
+.actions button.primary{background:#1a6657;color:#fff;border-color:#1a6657}
+.art svg{display:block;width:100%;max-width:400px;margin:auto}.art p{text-align:center;font-size:11px;color:#70877e}
+h2{font-size:27px;letter-spacing:-1px;margin:0 0 8px}
+.section-intro{margin:30px 0 16px}.section-intro p{color:#688078;line-height:1.65}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}
+.card{background:#fff;border:1px solid #dce8e2;border-radius:16px;padding:24px;text-align:left}
+button.card{width:100%}button.card:hover{border-color:#468a7c}
+.card strong{font-size:19px;display:block;margin-bottom:13px}.card p{font-size:14px;color:#6c8077;line-height:1.7;margin:0}
+.card .symbol{display:inline-block;background:#e8f3ed;color:#246b58;border-radius:9px;padding:8px 12px;margin-bottom:18px}
+.note{margin:18px 0;padding:16px 20px;background:#ebf4ef;border:1px solid #d7e9e0;border-radius:12px;color:#48685d;font-size:13px;line-height:1.6}
+.views{display:none}.views.active{display:block}.home{display:none}.home.active{display:block}
+.formrow{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}.formrow label{display:flex;flex-direction:column;gap:7px;color:#5b7269;font-size:13px}
+select{padding:11px;border:1px solid #cbdcd3;border-radius:8px;background:white;min-width:170px}
+.plot{margin-top:20px;padding:23px;border:1px dashed #a8c5b9;background:#f7fbf8;border-radius:12px;color:#5e776d;line-height:1.7}
+footer{margin:28px 0 42px;color:#667d74;font-size:13px;line-height:1.85}
+footer a{color:#206c5c}
+@media(max-width:760px){.hero{grid-template-columns:1fr;padding:28px}.art{max-width:280px}.cards{grid-template-columns:1fr}.tagh{display:none}.shell{padding:0 14px}h1{letter-spacing:-1.7px}}
+</style>
+</head>
+<body>
+<header><div class="shell"><div class="top"><div class="brand">
+<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="31" cy="33" r="16" fill="#a6cdbb" stroke="#326a5c" stroke-width="1.5"/><path d="M13 34C21 20 45 11 56 18 70 29 38 55 17 52 6 50 6 44 13 34" fill="none" stroke="#326a5c" stroke-width="2.6"/><path d="m47 14 10 3-5 9" fill="none" stroke="#326a5c" stroke-width="2.5"/><text x="23" y="39" font-size="23" font-family="Georgia,serif" font-weight="bold" fill="#153f36">m</text></svg>
+<div><b>mondoskopo</b><span>Observing humanity in motion</span></div></div><div class="tagh">Open data · Independent exploration</div></div>
+<nav aria-label="Main navigation"><button aria-selected="true" data-tab="home">Start</button><button aria-selected="false" data-tab="countries">Countries</button><button aria-selected="false" data-tab="compare">Compare</button><button aria-selected="false" data-tab="explore">Explore</button></nav></div></header>
+<main class="shell">
+<section id="home" class="home active">
+<div class="hero"><div><p class="eyebrow">A global telescope for human societies</p><h1>See societies<br>in motion.</h1><p class="intro">Explore how institutions and democratic structures evolve across countries and through time. Compare observations. Question explanations. Follow the evidence.</p>
+<div class="actions"><button class="primary" data-open="compare">Compare countries ↗</button><button data-open="countries">Explore a country</button></div></div>
+<div class="art"><svg viewBox="0 0 420 340" role="img" aria-label="Conceptual network of institutional connections">
+<circle cx="213" cy="172" r="127" fill="none" stroke="#b8d2c7"/>
+<circle cx="213" cy="172" r="94" fill="#c8e2d7" fill-opacity=".52"/>
+<g fill="none" stroke="#86b2a3" stroke-width="2"><path d="M101 111 174 94 239 129 311 83 330 194 255 237 151 223 91 192 101 111Z"/><path d="M174 94 151 223 239 129 330 194 91 192 255 237 311 83"/></g>
+<g fill="#fff" stroke="#4a8978" stroke-width="3"><circle cx="101" cy="111" r="8"/><circle cx="174" cy="94" r="7"/><circle cx="239" cy="129" r="10"/><circle cx="311" cy="83" r="8"/><circle cx="330" cy="194" r="9"/><circle cx="255" cy="237" r="7"/><circle cx="151" cy="223" r="8"/><circle cx="91" cy="192" r="7"/></g><circle cx="213" cy="172" r="18" fill="#2a685b"/><circle cx="213" cy="172" r="7" fill="#cbe3da"/>
+</svg><p>Conceptual illustration · Not observed country data</p></div></div>
+<div class="section-intro"><h2>Three ways to explore</h2><p>Start with a country, compare trajectories, or investigate relationships between indicators.</p></div>
+<div class="cards"><button class="card" data-open="countries"><span class="symbol">◉</span><strong>Countries</strong><p>Follow institutions and democratic indicators through time.</p></button><button class="card" data-open="compare"><span class="symbol">≋</span><strong>Compare</strong><p>Put Sweden and Poland side by side, or choose other countries.</p></button><button class="card" data-open="explore"><span class="symbol">✳</span><strong>Explore</strong><p>Look for relationships, while distinguishing correlation from explanation.</p></button></div>
+<div class="cards" style="grid-template-columns:repeat(auto-fit,minmax(250px,1fr));margin-top:17px"><div class="card"><strong>Observation before conclusion</strong><p>Every indicator should retain its source, scale and reference year. We do not invent a single overall stability score.</p></div><div class="card"><strong>Built to grow</strong><p>Democracy and institutions are the starting point. Other societal dimensions will follow as reliable evidence allows.</p></div></div>
+</section>
+<section class="views" id="countries"><div class="card"><p class="eyebrow">COUNTRY PROFILE</p><h2>Countries through time</h2><p>Choose a country to explore institutional change.</p><div class="formrow"><label>Country<select><option>Sweden</option><option>Poland</option></select></label><label>Indicator<select><option>Rule of law</option><option>Government effectiveness</option><option>Voice and accountability</option></select></label></div><div class="plot">Country datasets are being prepared. No indicator values are shown until a documented source has been imported and verified.</div></div></section>
+<section class="views" id="compare"><div class="card"><p class="eyebrow">COUNTRY COMPARISON</p><h2>Compare trajectories</h2><p>Compare the same indicator on the same scale and across the same years.</p><div class="formrow"><label>First country<select><option>Sweden</option><option>Poland</option></select></label><label>Second country<select><option>Poland</option><option>Sweden</option></select></label></div><div class="plot">Comparative charts will become available once the World Bank WGI observations have been imported. We do not use placeholder statistics.</div></div></section>
+<section class="views" id="explore"><div class="card"><p class="eyebrow">GLOBAL LANDSCAPE</p><h2>Explore relationships</h2><p>Explore associations across countries and years without confusing them with causal explanations.</p><div class="plot">Global scatterplots will become available after source datasets are loaded. Current status: awaiting verified observations.</div></div></section>
+<div class="note">Data status: The website is online. Country-level observations have not yet been published. This is an exploratory platform under development.</div>
+<footer><strong>Sources, methods & privacy</strong><p>Planned primary datasets: <a href="https://www.worldbank.org/en/publication/worldwide-governance-indicators">World Bank Worldwide Governance Indicators</a> and <a href="https://v-dem.net/data/the-v-dem-dataset/">V-Dem</a>. These indicators do not directly measure societal resilience or a population's ability to process complexity.</p><p>No advertising or visitor analytics are active in this release. The publicly served directory contains no DES files, databases or credentials.</p></footer>
+</main><script>
+function show(name){document.querySelectorAll('[data-tab]').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.tab===name)));document.querySelectorAll('.home,.views').forEach(s=>s.classList.toggle('active',s.id===name));location.hash=name==='home'?'':name;window.scrollTo({top:0,behavior:'smooth'});}
+document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.tab)));
+document.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.open)));
+const hash=location.hash.slice(1);if(['countries','compare','explore'].includes(hash))show(hash);
+</script></body></html>
