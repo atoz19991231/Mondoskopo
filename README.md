@@ -38,3 +38,26 @@ WGI metrics are perception-based estimates of governance dimensions, **not** dir
 
 Project source: https://www.worldbank.org/en/publication/worldwide-governance-indicators
 License: CC BY 4.0, with attribution.
+
+## Automatic WGI refresh on Netcup
+
+Mondoskopo can refresh its World Bank WGI observations monthly, without requiring GitHub Actions or AI workloads. The public code is **not** updated by the timer; it updates only the validated `wgi.json` data file. The importer runs as the unprivileged site operator; only the final verified JSON is copied into the public data directory with elevated permissions.
+
+Install the timer once (after reviewing the scripts):
+
+```bash
+cd ~/mondoskopo-deploy/site
+git pull --ff-only
+sudo bash scripts/install_monthly_refresh.sh
+```
+
+Inspect its schedule or status:
+
+```bash
+systemctl list-timers mondoskopo-wgi.timer --no-pager
+sudo systemctl status mondoskopo-wgi.service --no-pager
+```
+
+If a fetch, validation or comparison fails, the existing publicly served data file remains intact, and the failure is logged in the system journal. Each successful refresh backs up the previously served JSON to `/var/backups/mondoskopo`. The timer runs monthly (on the first of each month, with up to 30 minutes random delay) and catches up after server downtime if necessary.
+
+Important: The timer does *not* deploy changes to the HTML or JS application; frontend updates remain deliberate releases.
