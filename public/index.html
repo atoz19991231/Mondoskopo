@@ -75,16 +75,16 @@ footer a{color:#9bdcbc;text-underline-offset:3px}
 .country-overview h3{font-size:22px;letter-spacing:-.025em;margin:0 0 8px;color:#e4f5eb}
 .country-overview .overview-intro{color:#aec7b9;font-size:13px;line-height:1.7;margin:0 0 15px}
 .metric-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-.metric{display:flex;flex-direction:column;gap:12px;text-align:left;min-height:154px;padding:17px;background:#203b30;border:1px solid #375b49;border-radius:13px;color:#e3f4ea;transition:background .15s,border-color .15s}
+.metric{display:flex;flex-direction:column;gap:12px;text-align:left;min-height:154px;padding:17px;background:#203b30;border:1px solid #456958;border-radius:13px;color:#f0faf4;transition:background .15s,border-color .15s}
 .metric:hover,.metric:focus-visible{background:#294c3d;border-color:#88d0aa}
-.metric[aria-pressed=true]{border-color:#a3dfbc;box-shadow:inset 0 0 0 1px #a3dfbc}
-.metric-name{font-size:13px;line-height:1.45;color:#bbd6c6}
+.metric[aria-pressed=true]{background:#2a5040;border-color:#b8f1ce;box-shadow:inset 0 0 0 2px #a3dfbc}
+.metric-name{font-size:14px;line-height:1.45;color:#ebf8f1;font-weight:650}
 .metric-value{font-size:27px;line-height:1;font-weight:700;font-variant-numeric:tabular-nums}
-.metric-meta{display:block;color:#a6c8b6;font-size:12px;margin-top:auto;line-height:1.5}
-.metric-delta{font-size:12px;font-variant-numeric:tabular-nums}
-.metric-delta.up{color:#b6e4c7}
-.metric-delta.down{color:#ecc6a9}
-.metric-delta.flat{color:#bfd0c5}
+.metric-meta{display:block;color:#c8e3d5;font-size:13px;margin-top:auto;line-height:1.5}
+.metric-delta{font-size:13px;font-variant-numeric:tabular-nums;font-weight:650}
+.metric-delta.up{color:#c0f4d5}
+.metric-delta.down{color:#ffd1ad}
+.metric-delta.flat{color:#e1eee6}
 @media(max-width:800px){.metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:480px){.metric-grid{grid-template-columns:1fr 1fr;gap:8px}.metric{padding:12px;min-height:148px}.metric-value{font-size:23px}.country-overview h3{font-size:20px}}
 </style>
@@ -118,4 +118,4 @@ function show(name){document.querySelectorAll('[data-tab]').forEach(b=>b.setAttr
 document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.tab)));
 document.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.open)));
 const hash=location.hash.slice(1);if(['countries','compare','explore'].includes(hash))show(hash);
-</script><script src="wgi.js?v=profile-20261106-2" defer></script></body></html>
+</script><script src="wgi.js?v=profile-20261106-3" defer></script></body></html>
