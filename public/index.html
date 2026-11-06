@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#f6f9f7">
+<meta name="theme-color" content="#17231f">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
 <meta name="description" content="Explore institutions, democracy and societal change across countries and through time.">
 <title>Mondoskopo — Observing humanity in motion</title>
@@ -39,6 +39,54 @@ select{padding:11px;border:1px solid #cbdcd3;border-radius:8px;background:white;
 footer{margin:28px 0 42px;color:#667d74;font-size:13px;line-height:1.85}
 footer a{color:#206c5c}
 @media(prefers-color-scheme:dark){.brand-name{color:#eaf4f0}.brand-sub{color:#b9d9ce}}@media(max-width:760px){.brand img{width:54px;height:51px}.brand-name{font-size:23px}.brand-sub{font-size:11px}.hero{grid-template-columns:1fr;padding:28px}.art{max-width:280px}.cards{grid-template-columns:1fr}.tagh{display:none}.shell{padding:0 14px}h1{letter-spacing:-1.7px}}
+
+/* Mondoskopo visual system: purpose-built dark green, without grey card patches */
+:root{color-scheme:dark;color:#e1eee8;background:#101916}
+body{background:#101916;color:#e1eee8}
+header{background:#17231f;border-color:#2c4339}
+.brand-name{color:#eff8f2}.brand-sub{color:#adcbbd}
+.tagh{color:#9db9ab}
+nav button{color:#bed4ca}
+nav button:hover,nav button:focus-visible{background:#254239;color:#f1faf4}
+nav button[aria-selected=true]{background:#2a5145;color:#eafff5}
+.hero{background:linear-gradient(115deg,#192820 0%,#172820 53%,#102e24 100%);border-color:#365146}
+.eyebrow{color:#93d0b9}
+h1,h2{color:#e6f6ee}
+.intro,.section-intro p{color:#b4c9be}
+.actions button{background:#2b4238;color:#e7f7ee;border-color:#456b59}
+.actions button.primary{background:#0c6856;color:#f4fff8;border-color:#22836e}
+.actions button:hover{filter:brightness(1.13)}
+.art p{color:#93b1a2}
+.art svg > circle:nth-child(2){fill:#396a55;fill-opacity:.45}
+.card{background:#1a2a24;border-color:#335044;color:#e7f5ee;box-shadow:0 4px 16px #08100d15}
+button.card{transition:background .16s ease,border-color .16s ease,transform .16s ease}
+button.card:hover,button.card:focus-visible{border-color:#70ad91;background:#20392e;transform:translateY(-2px)}
+.card strong{color:#e7f5ee}
+.card p{color:#acc5b7}
+.card .symbol{background:#27483b;color:#a8e4c8}
+.note{background:#1b3329;border-color:#315544;color:#bfdfce}
+.formrow label{color:#b7d0c2}
+select{color:#e9f6ef;border-color:#456556;background:#243b30}
+select:focus-visible{outline:2px solid #83c7a8}
+.plot{background:#14251e;border-color:#416353;color:#bfd6c9}
+footer{color:#aac1b3}
+footer a{color:#9bdcbc;text-underline-offset:3px}
+.country-overview{margin-top:26px}
+.country-overview h3{font-size:22px;letter-spacing:-.025em;margin:0 0 8px;color:#e4f5eb}
+.country-overview .overview-intro{color:#aec7b9;font-size:13px;line-height:1.7;margin:0 0 15px}
+.metric-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.metric{display:flex;flex-direction:column;gap:12px;text-align:left;min-height:154px;padding:17px;background:#203b30;border:1px solid #375b49;border-radius:13px;color:#e3f4ea;transition:background .15s,border-color .15s}
+.metric:hover,.metric:focus-visible{background:#294c3d;border-color:#88d0aa}
+.metric[aria-pressed=true]{border-color:#a3dfbc;box-shadow:inset 0 0 0 1px #a3dfbc}
+.metric-name{font-size:13px;line-height:1.45;color:#bbd6c6}
+.metric-value{font-size:27px;line-height:1;font-weight:700;font-variant-numeric:tabular-nums}
+.metric-meta{display:block;color:#a6c8b6;font-size:12px;margin-top:auto;line-height:1.5}
+.metric-delta{font-size:12px;font-variant-numeric:tabular-nums}
+.metric-delta.up{color:#b6e4c7}
+.metric-delta.down{color:#ecc6a9}
+.metric-delta.flat{color:#bfd0c5}
+@media(max-width:800px){.metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){.metric-grid{grid-template-columns:1fr 1fr;gap:8px}.metric{padding:12px;min-height:148px}.metric-value{font-size:23px}.country-overview h3{font-size:20px}}
 </style>
 </head>
 <body>
@@ -60,7 +108,7 @@ footer a{color:#206c5c}
 <div class="cards"><button class="card" data-open="countries"><span class="symbol">◉</span><strong>Countries</strong><p>Follow institutions and democratic indicators through time.</p></button><button class="card" data-open="compare"><span class="symbol">≋</span><strong>Compare</strong><p>Put Sweden and Poland side by side, or choose other countries.</p></button><button class="card" data-open="explore"><span class="symbol">✳</span><strong>Explore</strong><p>Look for relationships, while distinguishing correlation from explanation.</p></button></div>
 <div class="cards" style="grid-template-columns:repeat(auto-fit,minmax(250px,1fr));margin-top:17px"><div class="card"><strong>Observation before conclusion</strong><p>Every indicator should retain its source, scale and reference year. We do not invent a single overall stability score.</p></div><div class="card"><strong>Built to grow</strong><p>Democracy and institutions are the starting point. Other societal dimensions will follow as reliable evidence allows.</p></div></div>
 </section>
-<section class="views" id="countries"><div class="card"><p class="eyebrow">COUNTRY PROFILE</p><h2>Countries through time</h2><p>Choose a country to explore institutional change.</p><div class="formrow"><label>Country<select><option>Sweden</option><option>Poland</option></select></label><label>Indicator<select><option>Rule of law</option><option>Government effectiveness</option><option>Voice and accountability</option></select></label></div><div class="plot">Country datasets are being prepared. No indicator values are shown until a documented source has been imported and verified.</div></div></section>
+<section class="views" id="countries"><div class="card"><p class="eyebrow">COUNTRY PROFILE</p><h2>Countries through time</h2><p>Choose a country to explore institutional change.</p><div class="formrow"><label>Country<select><option>Sweden</option><option>Poland</option></select></label><label>Indicator<select><option>Rule of law</option><option>Government effectiveness</option><option>Voice and accountability</option></select></label></div><div class="country-overview" id="country-overview" aria-live="polite"></div><div class="plot">Country datasets are being prepared. No indicator values are shown until a documented source has been imported and verified.</div></div></section>
 <section class="views" id="compare"><div class="card"><p class="eyebrow">COUNTRY COMPARISON</p><h2>Compare trajectories</h2><p>Compare the same indicator on the same scale and across the same years.</p><div class="formrow"><label>First country<select><option>Sweden</option><option>Poland</option></select></label><label>Second country<select><option>Poland</option><option>Sweden</option></select></label></div><div class="plot">Comparative charts will become available once the World Bank WGI observations have been imported. We do not use placeholder statistics.</div></div></section>
 <section class="views" id="explore"><div class="card"><p class="eyebrow">GLOBAL LANDSCAPE</p><h2>Explore relationships</h2><p>Explore associations across countries and years without confusing them with causal explanations.</p><div class="plot">Global scatterplots will become available after source datasets are loaded. Current status: awaiting verified observations.</div></div></section>
 <div class="note">Data status: The website is online. Country-level observations have not yet been published. This is an exploratory platform under development.</div>
