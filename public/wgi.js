@@ -37,11 +37,11 @@
       style:"width:100%;height:auto"
     });
     for(const tick of [0,25,50,75,100]){
-      plot.append(S("line",{x1:l,x2:W-r,y1:y(tick),y2:y(tick),stroke:"#c9dcd3"}));
-      plot.append(S("text",{x:l-10,y:y(tick)+4,"text-anchor":"end","font-size":12,fill:"#657e72"},tick));
+      plot.append(S("line",{x1:l,x2:W-r,y1:y(tick),y2:y(tick),stroke:"#3a584a"}));
+      plot.append(S("text",{x:l-10,y:y(tick)+4,"text-anchor":"end","font-size":12,fill:"#aac8b8"},tick));
     }
     for(const yr of [...new Set([min,Math.round((min+max)/2),max])]){
-      plot.append(S("text",{x:x(yr),y:H-14,"text-anchor":"middle","font-size":12,fill:"#657e72"},yr));
+      plot.append(S("text",{x:x(yr),y:H-14,"text-anchor":"middle","font-size":12,fill:"#aac8b8"},yr));
     }
     const legend=document.createElement("div");
     legend.style.cssText="display:flex;flex-wrap:wrap;gap:18px;margin:10px 0";
@@ -59,10 +59,54 @@
       legend.append(label);
     }
     const note=T("p","Source: World Bank Worldwide Governance Indicators, 2026 update. These perception-based governance estimates are not measures of democracy or societal resilience. Missing years are left as gaps.");
-    note.style.cssText="color:#59766c;font-size:12px;line-height:1.6";
+    note.style.cssText="color:#a7c6b5;font-size:12px;line-height:1.6";
     const source=T("p","Retrieved "+data.source.retrieved_utc.slice(0,10)+" · CC BY 4.0 · WGI scores, not percentiles.");
-    source.style.cssText="color:#637f74;font-size:12px";
+    source.style.cssText="color:#a7c6b5;font-size:12px";
     target.append(head,legend,plot,note,source);
+  }
+
+  function countryOverview(target, data, iso, selectedCode, onSelect) {
+    if(!target)return;
+    const country = data.countries[iso];
+    target.replaceChildren();
+    if(!country)return;
+    const heading=T("h3",country.name+" · Institutional profile");
+    const intro=T("p","Six World Bank WGI dimensions. Scores are 0–100; each dimension shows its own latest observation and, where available, a ten-year change in score points.");
+    intro.className="overview-intro";
+    const grid=document.createElement("div");
+    grid.className="metric-grid";
+    for(const code of codes) {
+      const series=(country.indicators[code]||[]).filter(p=>
+        Number.isInteger(p.year)&&Number.isFinite(p.value)&&p.value>=0&&p.value<=100
+      ).sort((a,b)=>a.year-b.year);
+      const latest=series.length ? series[series.length-1] : null;
+      const baseline=latest ? series.find(p=>p.year===latest.year-10) : null;
+      const metric=document.createElement("button");
+      metric.type="button";
+      metric.className="metric";
+      metric.setAttribute("aria-pressed",String(code===selectedCode));
+      metric.append(T("span",data.indicators[code]||code));
+      metric.firstChild.className="metric-name";
+      const value=T("span",latest ? latest.value.toFixed(1) : "—");
+      value.className="metric-value";
+      metric.append(value);
+      const yearLabel=T("span",latest ? "WGI score · "+latest.year+" · 0–100" : "No verified observations");
+      yearLabel.className="metric-meta";
+      metric.append(yearLabel);
+      const delta=T("span",baseline
+        ? ((latest.value-baseline.value)>0?"+":"")+(latest.value-baseline.value).toFixed(1)
+          +" points · "+baseline.year+"–"+latest.year
+        : "Ten-year change unavailable");
+      const change=baseline ? latest.value-baseline.value : null;
+      delta.className="metric-delta "+(change===null||Math.abs(change)<0.05?"flat":change>0?"up":"down");
+      metric.append(delta);
+      metric.addEventListener("click",()=>onSelect(code));
+      grid.append(metric);
+    }
+    const caveat=T("p","Changes describe estimated governance scores, not statistical significance, causes, overall democracy, or societal resilience. Select a dimension to see its historical series.");
+    caveat.className="overview-intro";
+    caveat.style.marginTop="14px";
+    target.append(heading,intro,grid,caveat);
   }
 
   function setupExplore(data){
@@ -115,14 +159,14 @@
         style:"display:block;width:100%;height:auto"
       });
       for(const tick of [0,25,50,75,100]){
-        plot.append(S("line",{x1:xx(tick),x2:xx(tick),y1:top,y2:H-bottom,stroke:"#bdcec5"}));
-        plot.append(S("line",{x1:left,x2:W-right,y1:yy(tick),y2:yy(tick),stroke:"#bdcec5"}));
-        plot.append(S("text",{x:xx(tick),y:H-bottom+19,"text-anchor":"middle","font-size":12,fill:"#657e72"},tick));
-        plot.append(S("text",{x:left-13,y:yy(tick)+5,"text-anchor":"end","font-size":12,fill:"#657e72"},tick));
+        plot.append(S("line",{x1:xx(tick),x2:xx(tick),y1:top,y2:H-bottom,stroke:"#3a584a"}));
+        plot.append(S("line",{x1:left,x2:W-right,y1:yy(tick),y2:yy(tick),stroke:"#3a584a"}));
+        plot.append(S("text",{x:xx(tick),y:H-bottom+19,"text-anchor":"middle","font-size":12,fill:"#aac8b8"},tick));
+        plot.append(S("text",{x:left-13,y:yy(tick)+5,"text-anchor":"end","font-size":12,fill:"#aac8b8"},tick));
       }
       for(const p of points){
         const circ=S("circle",{
-          cx:xx(p.x),cy:yy(p.y),r:4.8,fill:p.iso==="SWE"?"#bc7e42":"#217969",
+          cx:xx(p.x),cy:yy(p.y),r:4.8,fill:p.iso==="SWE"?"#edc17d":"#75c9aa",
           "fill-opacity":0.75,stroke:"#fff","stroke-width":0.7,
           tabindex:"0",role:"img",
           "aria-label":p.name+": "+p.x.toFixed(1)+", "+p.y.toFixed(1)
@@ -131,17 +175,17 @@
         plot.append(circ);
       }
       const labelX=S("text",{
-        x:W/2,y:H-6,"text-anchor":"middle","font-size":13,fill:"#658176"
+        x:W/2,y:H-6,"text-anchor":"middle","font-size":13,fill:"#aac8b8"
       },data.indicators[xCode]+" (0–100)");
       const labelY=S("text",{
         x:16,y:H/2,transform:"rotate(-90 16 "+H/2+")",
-        "text-anchor":"middle","font-size":13,fill:"#658176"
+        "text-anchor":"middle","font-size":13,fill:"#aac8b8"
       },data.indicators[yCode]+" (0–100)");
       plot.append(labelX,labelY);
       const title=T("p",points.length+" countries and territories · "+year);
       title.style.fontWeight="700";
       const caveat=T("p","Source: World Bank WGI, 2026 update. Dots are governance estimates, not precise measurements. Relationships in this chart do not imply causation. Source year: "+year+"; retrieved: "+data.source.retrieved_utc.slice(0,10)+".");
-      caveat.style.cssText="font-size:12px;color:#657e72;line-height:1.7";
+      caveat.style.cssText="font-size:12px;color:#a7c6b5;line-height:1.7";
       line.append(title,plot,caveat);
     }
     for(const el of [xIndicator,yIndicator,yearSelect])el.addEventListener("change",render);
@@ -174,10 +218,19 @@
     const comparisonIndicator=document.createElement("select");
     options(comparisonIndicator,inds);label.append(comparisonIndicator);
     document.querySelector("#compare .formrow").append(label);
-    const country=()=>chart(document.querySelector("#countries .plot"),data,
-      [[cs[0].value,data.countries[cs[0].value].name,"#1a6657"]],cs[1].value);
+    const country=()=>{
+      const iso=cs[0].value;
+      const record=data.countries[iso];
+      if(!record)return;
+      countryOverview(document.querySelector("#country-overview"),data,iso,cs[1].value,code=>{
+        cs[1].value=code;
+        country();
+      });
+      chart(document.querySelector("#countries .plot"),data,
+        [[iso,record.name,"#79d8b4"]],cs[1].value);
+    };
     const compare=()=>chart(document.querySelector("#compare .plot"),data,
-      [...new Set([ds[0].value,ds[1].value])].map((iso,i)=>[iso,data.countries[iso].name,i?"#7b64aa":"#1a6657"]),
+      [...new Set([ds[0].value,ds[1].value])].map((iso,i)=>[iso,data.countries[iso].name,i?"#c6a8ec":"#79d8b4"]),
       comparisonIndicator.value);
     for(const el of cs)el.addEventListener("change",country);
     for(const el of [...ds,comparisonIndicator])el.addEventListener("change",compare);
