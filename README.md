@@ -13,23 +13,24 @@ Current website: https://mondoskopo.org
 - Keep all private files, databases, local services and credentials outside the public website directory and repository.
 - Country-indicator values must be sourced and documented; never use invented values.
 
-The initial website release is being added to this repository. Source provenance: World Bank WGI and optional V-Dem, with source year and version identified on the site when datasets are loaded.
+Data currently available: World Bank WGI. Additional sources, including V-Dem, may be added after their indicators and licensing are verified.
 
 
-## First real dataset: World Bank WGI (Sweden and Poland)
+## Country coverage: World Bank WGI
 
-The `scripts/update_wgi.py` program fetches the 2026 World Bank WGI governance *scores* (0–100), not older percentile ranks or the standardized -2.5 to +2.5 estimates. It requires all six indicator series for Sweden and Poland and validates the observed values before writing `public/data/wgi.json` atomically. The script never inserts made-up numbers.
+The `scripts/update_wgi.py` program fetches the 2026 World Bank WGI governance *scores* (0–100), not older percentile ranks or the standardized -2.5 to +2.5 estimates. It retrieves all available countries and territories using the World Bank country catalogue, excluding regional aggregates. All six indicator series must have broad historical coverage; Sweden and Poland remain baseline checks. The importer validates the observed values before writing `public/data/wgi.json` atomically. The script never inserts made-up numbers.
 
-Run on the Debian Netcup server from the isolated checkout:
+Run offline validation tests, then retrieve and publish data from the isolated checkout on the Netcup server:
 
 ```bash
 cd ~/mondoskopo-deploy/site
 git pull --ff-only
+python3 -m unittest discover -s tests -v
 python3 scripts/update_wgi.py
 bash deploy.sh
 ```
 
-The first WGI fetch requires internet access and uses only the Python standard library. If the World Bank endpoint fails, the script fails and keeps the previously published data untouched. When data is present, Countries and Compare show interactive source-attributed timeseries. Explore is not yet implemented.
+The first WGI fetch requires internet access and uses only the Python standard library. If the World Bank endpoint fails, the script fails and keeps the previously published data untouched. When data is present, Countries and Compare show interactive source-attributed time series for the available economies. Explore visualizes pairs of WGI dimensions within a single year, with one point per economy. This exploratory association is not a causal estimate.
 
 No automatic refresh job is active yet. In a later phase, schedule the import, validate the newly downloaded series, and deploy only verified updates.
 
