@@ -18,4 +18,4 @@ install -m 644 "$PROJECT/ops/mondoskopo-wgi.timer" /etc/systemd/system/mondoskop
 systemctl daemon-reload
 systemctl enable --now mondoskopo-wgi.timer
 systemctl list-timers mondoskopo-wgi.timer --no-pager
-echo "Monthly WGI refresh scheduled. The installer did not publish or alter any existing data."
+echo "Monthly WGI refresh scheduled. A catch-up refresh may run after enabling the timer."
