@@ -93,11 +93,12 @@
       const yearLabel=T("span",latest ? "WGI score · "+latest.year+" · 0–100" : "No verified observations");
       yearLabel.className="metric-meta";
       metric.append(yearLabel);
+      const change=baseline ? latest.value-baseline.value : null;
+      const shownChange=change===null ? null : Math.round(change*10)/10;
       const delta=T("span",baseline
-        ? ((latest.value-baseline.value)>0?"+":"")+(latest.value-baseline.value).toFixed(1)
+        ? (shownChange>0?"+":"")+shownChange.toFixed(1)
           +" points · "+baseline.year+"–"+latest.year
         : "Ten-year change unavailable");
-      const change=baseline ? latest.value-baseline.value : null;
       delta.className="metric-delta "+(change===null||Math.abs(change)<0.05?"flat":change>0?"up":"down");
       metric.append(delta);
       metric.addEventListener("click",()=>onSelect(code));
