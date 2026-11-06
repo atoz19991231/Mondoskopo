@@ -14,4 +14,4 @@ if [ -s "$BASE/public/data/wgi.json" ]; then
   sudo install -d -m 755 "$TARGET/data"
   sudo install -m 644 "$BASE/public/data/wgi.json" "$TARGET/data/wgi.json"
 fi
-echo "Mondoskopo public homepage deployed. No DES files or services changed."
+echo "Mondoskopo public homepage deployed."
