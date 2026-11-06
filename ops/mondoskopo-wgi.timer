@@ -1,0 +1,11 @@
+[Unit]
+Description=Monthly verified World Bank WGI data refresh for Mondoskopo
+
+[Timer]
+OnCalendar=monthly
+Persistent=true
+RandomizedDelaySec=30min
+Unit=mondoskopo-wgi.service
+
+[Install]
+WantedBy=timers.target
