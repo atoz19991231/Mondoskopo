@@ -9,4 +9,9 @@ if [ -f "$TARGET/index.html" ]; then
   sudo cp -p "$TARGET/index.html" "/var/backups/mondoskopo/index-$(date +%Y%m%d-%H%M%S).html"
 fi
 sudo install -m 644 "$BASE/public/index.html" "$TARGET/index.html"
+sudo install -m 644 "$BASE/public/wgi.js" "$TARGET/wgi.js"
+if [ -s "$BASE/public/data/wgi.json" ]; then
+  sudo install -d -m 755 "$TARGET/data"
+  sudo install -m 644 "$BASE/public/data/wgi.json" "$TARGET/data/wgi.json"
+fi
 echo "Mondoskopo public homepage deployed. No DES files or services changed."
