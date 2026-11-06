@@ -10,6 +10,11 @@ if [ -f "$TARGET/index.html" ]; then
 fi
 sudo install -m 644 "$BASE/public/index.html" "$TARGET/index.html"
 sudo install -m 644 "$BASE/public/wgi.js" "$TARGET/wgi.js"
+test -s "$BASE/public/assets/mondoskopo-header.webp" || { echo "Missing Mondoskopo header artwork" >&2; exit 1; }
+test -s "$BASE/public/assets/favicon-32.png" || { echo "Missing Mondoskopo favicon" >&2; exit 1; }
+sudo install -d -m 755 "$TARGET/assets"
+sudo install -m 644 "$BASE/public/assets/mondoskopo-header.webp" "$TARGET/assets/mondoskopo-header.webp"
+sudo install -m 644 "$BASE/public/assets/favicon-32.png" "$TARGET/assets/favicon-32.png"
 if [ -s "$BASE/public/data/wgi.json" ]; then
   sudo install -d -m 755 "$TARGET/data"
   sudo install -m 644 "$BASE/public/data/wgi.json" "$TARGET/data/wgi.json"
