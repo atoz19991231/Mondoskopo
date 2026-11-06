@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#f6f9f7">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
 <meta name="description" content="Explore institutions, democracy and societal change across countries and through time.">
 <title>Mondoskopo — Observing humanity in motion</title>
 <style>
@@ -10,9 +11,8 @@
 body{margin:0}button{font:inherit;cursor:pointer}button:focus-visible{outline:3px solid #267769;outline-offset:3px}
 .shell{max-width:1140px;margin:0 auto;padding:0 24px}
 header{background:#fff;border-bottom:1px solid #dae5df}
-.top{display:flex;align-items:center;justify-content:space-between;padding:17px 0}
-.brand{display:flex;gap:13px;align-items:center}.brand svg{width:58px;height:58px}
-.brand b{font-size:25px;letter-spacing:-1.3px}.brand span{display:block;font-size:12px;color:#607a73;margin-top:2px}
+.top{display:flex;align-items:center;justify-content:space-between;padding:4px 0}
+.brand{display:flex;align-items:center}.brand img{display:block;width:280px;max-width:58vw;height:auto;background:#fff;border-radius:8px}
 .tagh{font-size:12px;color:#56766a}nav{display:flex;gap:6px;flex-wrap:wrap;padding-bottom:14px}
 nav button{border:0;background:transparent;color:#49695f;border-radius:10px;padding:11px 17px}
 nav button[aria-selected=true]{background:#e1efe9;color:#185c50;font-weight:700}
@@ -38,13 +38,12 @@ select{padding:11px;border:1px solid #cbdcd3;border-radius:8px;background:white;
 .plot{margin-top:20px;padding:23px;border:1px dashed #a8c5b9;background:#f7fbf8;border-radius:12px;color:#5e776d;line-height:1.7}
 footer{margin:28px 0 42px;color:#667d74;font-size:13px;line-height:1.85}
 footer a{color:#206c5c}
-@media(max-width:760px){.hero{grid-template-columns:1fr;padding:28px}.art{max-width:280px}.cards{grid-template-columns:1fr}.tagh{display:none}.shell{padding:0 14px}h1{letter-spacing:-1.7px}}
+@media(max-width:760px){.brand img{width:210px}.hero{grid-template-columns:1fr;padding:28px}.art{max-width:280px}.cards{grid-template-columns:1fr}.tagh{display:none}.shell{padding:0 14px}h1{letter-spacing:-1.7px}}
 </style>
 </head>
 <body>
 <header><div class="shell"><div class="top"><div class="brand">
-<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="31" cy="33" r="16" fill="#a6cdbb" stroke="#326a5c" stroke-width="1.5"/><path d="M13 34C21 20 45 11 56 18 70 29 38 55 17 52 6 50 6 44 13 34" fill="none" stroke="#326a5c" stroke-width="2.6"/><path d="m47 14 10 3-5 9" fill="none" stroke="#326a5c" stroke-width="2.5"/><text x="23" y="39" font-size="23" font-family="Georgia,serif" font-weight="bold" fill="#153f36">m</text></svg>
-<div><b>mondoskopo</b><span>Observing humanity in motion</span></div></div><div class="tagh">Open data · Independent exploration</div></div>
+<img src="assets/mondoskopo-header.webp" alt="Mondoskopo" width="450" height="150" decoding="async" /></div><div class="tagh">Open data · Independent exploration</div></div>
 <nav aria-label="Main navigation"><button aria-selected="true" data-tab="home">Start</button><button aria-selected="false" data-tab="countries">Countries</button><button aria-selected="false" data-tab="compare">Compare</button><button aria-selected="false" data-tab="explore">Explore</button></nav></div></header>
 <main class="shell">
 <section id="home" class="home active">
