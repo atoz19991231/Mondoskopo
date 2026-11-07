@@ -77,3 +77,9 @@ The Compare view offers two country selectors and a **shared** From year / To ye
 For each of the six indicators, the comparison shows both countries' selected end-year scores and their changes in WGI **score points** between the exact selected years. Cards are ordered by the absolute difference in these changes, calculated as first-country change minus second-country change. This is a difference in historical changes, **not** a ranking of countries, an estimate of causation, or a test of statistical significance. Selecting a card updates the shared historical chart to that dimension.
 
 The selected-year interval is reused in the two-country chart. Source records are not interpolated. Empty endpoints do not become zeroes; only indicators with actual data for the same two years receive numerical change values.
+
+## Global exploration on touchscreens
+
+The Explore scatterplot displays two individual WGI governance scores for a single source year. Visitors can select the two axes and year, choose a country or territory from the accessible selector, or tap its plotted point. The selected country is highlighted and its exact pair of observed WGI scores is presented in a separate panel with a link to its country profile.
+
+Only countries with observed values for both chosen indicators and the chosen year appear as dots. The panel explicitly reports unavailable pairs; no placeholder scores or interpolated data are displayed. Countries remain labeled in original World Bank geography terminology and associations are not interpreted as causation. Inputs and selected markers work without external map dependencies.
