@@ -141,9 +141,14 @@
     function render(){
       const first=data.countries[a.value],second=data.countries[b.value];
       metrics.replaceChildren();
-      if(!years.length){
-        metrics.append(T("p","No shared observation years for these selections."));
-        figure.replaceChildren();return;
+      if(years.length<2){
+        const message="At least two shared observation years are required for an interval comparison.";
+        metrics.append(T("p",message));
+        figure.replaceChildren(T("p",message));
+        periodLabel.textContent="—";
+        from.output.textContent="—";
+        to.output.textContent="—";
+        return;
       }
       periodLabel.textContent=startYear+"–"+endYear;
       from.output.textContent=String(startYear);
