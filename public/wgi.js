@@ -336,7 +336,8 @@
       for(const series of Object.values(country.indicators||{}))
         for(const p of series)
           if(Number.isInteger(p.year)&&Number.isFinite(p.value))years.add(p.year);
-    options(yearSelect,[...years].sort((a,b)=>b-a).map(y=>[String(y),String(y)]));
+    const yearValues=[...years].sort((a,b)=>a-b);
+    options(yearSelect,[...yearValues].reverse().map(y=>[String(y),String(y)]));
     yearLabel.append(yearSelect);panel.append(yearLabel);
 
     const countryLabel=document.createElement("label");
@@ -351,12 +352,41 @@
     countryLabel.append(countrySelect);
     panel.append(countryLabel);
     section.insertBefore(panel,line);
+
+    // Scrub only source years that have actual recorded observations.
+    // The slider maps indices to recorded years; it does not manufacture
+    // years between 1996, 1998, 2000, etc.
+    const timeline=document.createElement("div");
+    timeline.className="explore-timeline";
+    const timelineHead=document.createElement("div");
+    timelineHead.className="explore-timeline-head";
+    const timelineTitle=T("strong","Explore change over time");
+    const currentYear=T("output",String(yearValues[yearValues.length-1]??"—"));
+    currentYear.className="explore-current-year";
+    timelineHead.append(timelineTitle,currentYear);
+    const slider=document.createElement("input");
+    slider.type="range";
+    slider.className="explore-year-slider";
+    slider.min="0";
+    slider.max=String(Math.max(0,yearValues.length-1));
+    slider.step="1";
+    slider.value=slider.max;
+    slider.setAttribute("aria-label","Observation year");
+    slider.setAttribute("aria-valuetext",String(yearValues[yearValues.length-1]??""));
+    const yearExtent=document.createElement("div");
+    yearExtent.className="explore-year-extent";
+    yearExtent.append(T("span",String(yearValues[0]??"")),
+      T("span","Drag to move through observed years"),
+      T("span",String(yearValues[yearValues.length-1]??"")));
+    timeline.append(timelineHead,slider,yearExtent);
+    section.insertBefore(timeline,line);
+
     const countryDetail=document.createElement("div");
     countryDetail.className="explore-selection";
     countryDetail.setAttribute("aria-live","polite");
     section.insertBefore(countryDetail,line);
     const info=section.querySelector("p:not(.eyebrow)");
-    if(info)info.textContent="Each dot represents one country or territory in a single year. Tap a dot, or choose a country, to see its actual indicator scores. Association does not imply causation.";
+    if(info)info.textContent="Drag the year slider to see countries move in the chart. Choose a country to follow its observed path. You can also tap a dot to view its exact scores.";
 
     function render(){
       const xCode=xIndicator.value,yCode=yIndicator.value,year=+yearSelect.value;
@@ -410,6 +440,35 @@
         plot.append(S("text",{x:xx(tick),y:H-bottom+19,"text-anchor":"middle","font-size":12,fill:"#aac8b8"},tick));
         plot.append(S("text",{x:left-13,y:yy(tick)+5,"text-anchor":"end","font-size":12,fill:"#aac8b8"},tick));
       }
+      // Golden path: observed X/Y pairs for the chosen country through the
+      // selected year. Draw line segments only between recorded observations.
+      // No values are synthesized for unobserved years.
+      if(chosenCountry){
+        const xs=new Map((chosenCountry.indicators[xCode]||[])
+          .filter(p=>Number.isInteger(p.year)&&p.year<=year&&Number.isFinite(p.value)&&p.value>=0&&p.value<=100)
+          .map(p=>[p.year,p.value]));
+        const history=(chosenCountry.indicators[yCode]||[])
+          .filter(p=>xs.has(p.year)&&p.year<=year&&Number.isFinite(p.value)&&p.value>=0&&p.value<=100)
+          .map(p=>({year:p.year,x:xs.get(p.year),y:p.value}))
+          .sort((a,b)=>a.year-b.year);
+        if(history.length>1){
+          plot.append(S("polyline",{
+            points:history.map(p=>xx(p.x).toFixed(1)+","+yy(p.y).toFixed(1)).join(" "),
+            fill:"none",stroke:"#ffd28a","stroke-width":2.8,
+            "stroke-opacity":.88,"stroke-dasharray":"5 4","stroke-linejoin":"round",
+            "pointer-events":"none"
+          }));
+        }
+        for(const p of history){
+          const dot=S("circle",{
+            cx:xx(p.x),cy:yy(p.y),r:3.2,
+            fill:"#ffd28a","fill-opacity":.95,
+            stroke:"#1f3025","stroke-width":.9,"pointer-events":"none"
+          });
+          dot.append(S("title",{},chosenCountry.name+" · "+p.year));
+          plot.append(dot);
+        }
+      }
       // Render selected last, so it is visible and touchable if points overlap.
       points.sort((a,b)=>Number(a.iso===selected)-Number(b.iso===selected));
       for(const p of points){
@@ -448,12 +507,29 @@
       },data.indicators[yCode]+" (0–100)"));
       const title=T("p",points.length+" countries and territories with paired observations · "+year);
       title.style.fontWeight="700";
-      const caveat=T("p","Source: World Bank WGI, 2026 update. Scores are governance estimates, not precise measurements. Relationships do not imply causation. Source year: "+year+"; retrieved: "+data.source.retrieved_utc.slice(0,10)+".");
+      const caveat=T("p","Source: World Bank WGI, 2026 update. The golden trail connects actual observation-year positions of the selected country, with no estimated intervening values. Other points show only countries with both observations in "+year+". These are governance estimates, not causal findings. Retrieved: "+data.source.retrieved_utc.slice(0,10)+".");
       caveat.style.cssText="font-size:12px;color:#a7c6b5;line-height:1.7";
       line.append(title,plot,caveat);
     }
-    for(const el of [xIndicator,yIndicator,yearSelect,countrySelect])
+    for(const el of [xIndicator,yIndicator,countrySelect])
       el.addEventListener("change",render);
+    const syncYear=()=>{
+      const index=yearValues.indexOf(Number(yearSelect.value));
+      if(index<0)return;
+      slider.value=String(index);
+      currentYear.textContent=yearSelect.value;
+      slider.setAttribute("aria-valuetext",yearSelect.value);
+      render();
+    };
+    yearSelect.addEventListener("change",syncYear);
+    slider.addEventListener("input",()=>{
+      const next=yearValues[Number(slider.value)];
+      if(next===undefined)return;
+      yearSelect.value=String(next);
+      currentYear.textContent=String(next);
+      slider.setAttribute("aria-valuetext",String(next));
+      render();
+    });
     render();
   }
 
