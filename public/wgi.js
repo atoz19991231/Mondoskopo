@@ -205,6 +205,110 @@
     target.append(ranking);
   }
 
+
+  function comparisonYears(first,second) {
+    // Prefer dates observed in all six dimensions of BOTH selected countries.
+    const all=codes.flatMap(code=>[first,second].map(country=>
+      new Set((country.indicators[code]||[])
+        .filter(p=>Number.isInteger(p.year)&&Number.isFinite(p.value)&&p.value>=0&&p.value<=100)
+        .map(p=>p.year))));
+    let years=[...all[0]].filter(y=>all.every(set=>set.has(y))).sort((a,b)=>a-b);
+    if(years.length>=2)return years;
+    // With incomplete coverage, offer only dates that exist in BOTH countries
+    // for at least one dimension, and mark unavailable pairs explicitly.
+    const union=country=>new Set(codes.flatMap(code=>(country.indicators[code]||[])
+      .filter(p=>Number.isInteger(p.year)&&Number.isFinite(p.value)&&p.value>=0&&p.value<=100)
+      .map(p=>p.year)));
+    const firstYears=union(first), secondYears=union(second);
+    return [...firstYears].filter(y=>secondYears.has(y)).sort((a,b)=>a-b);
+  }
+
+  function signedPoints(value) {
+    if(value===null)return "Unavailable";
+    return (value>0?"+":"")+value.toFixed(1)+" pts";
+  }
+
+  function compareOverview(target,data,firstIso,secondIso,selectedCode,onSelect,state,onPeriodChange) {
+    if(!target)return;
+    target.replaceChildren();
+    const first=data.countries[firstIso],second=data.countries[secondIso];
+    if(!first||!second)return;
+    const heading=T("h3",first.name+" and "+second.name+" · Institutional change");
+    heading.className="comparison-title";
+    target.append(heading);
+    if(firstIso===secondIso){
+      target.append(T("p","Choose two different countries to compare their trajectories."));
+      return;
+    }
+    const years=comparisonYears(first,second);
+    selectDefaultPeriod(years,state,firstIso+"|"+secondIso);
+    if(state.from===null||state.to===null){
+      const note=T("p","These countries do not have two shared observation years for a reliable comparison.");
+      note.className="comparison-intro";target.append(note);return;
+    }
+    const controls=document.createElement("div");
+    controls.className="period-controls";
+    function yearControl(labelText,value,allowed,onChange){
+      const label=document.createElement("label");
+      label.append(T("span",labelText));
+      const select=document.createElement("select");
+      options(select,allowed.map(year=>[String(year),String(year)]));
+      select.value=String(value);
+      select.addEventListener("change",()=>{onChange(Number(select.value));onPeriodChange();});
+      label.append(select);controls.append(label);
+    }
+    yearControl("From year",state.from,years.filter(y=>y<state.to),year=>{state.from=year;});
+    yearControl("To year",state.to,years.filter(y=>y>state.from),year=>{state.to=year;});
+    const timeframe=T("span",String(state.to-state.from)+" calendar years · same dates for both countries");
+    timeframe.className="period-detail";controls.append(timeframe);target.append(controls);
+
+    const firstRows=periodDifferences(first,state.from,state.to);
+    const secondRows=periodDifferences(second,state.from,state.to);
+    const rows=firstRows.map((left,index)=>{
+      const right=secondRows[index];
+      const gap=left.change!==null&&right.change!==null
+        ? Math.round((left.change-right.change)*10)/10:null;
+      return {code:left.code,index,left,right,gap:gap===0?0:gap};
+    });
+    // Largest difference between changes comes first, ties keep source order.
+    rows.sort((a,b)=>(b.gap===null?-1:a.gap===null?1:
+      Math.abs(b.gap)-Math.abs(a.gap))||a.index-b.index);
+    const intro=T("p","All six dimensions are compared between "+state.from+" and "+state.to+". Ranked by the absolute difference between the two countries' changes, not by their overall scores.");
+    intro.className="comparison-intro";target.append(intro);
+    const grid=document.createElement("div");
+    grid.className="comparison-grid";
+    for(const row of rows){
+      const card=document.createElement("button");
+      card.type="button";card.className="comparison-card";
+      card.setAttribute("aria-pressed",String(row.code===selectedCode));
+      const title=T("span",data.indicators[row.code]||row.code);
+      title.className="comparison-card-heading";card.append(title);
+      const pair=document.createElement("div");pair.className="comparison-pair";
+      for(const [country,entry] of [[first,row.left],[second,row.right]]){
+        const col=document.createElement("div");col.className="comparison-pair-col";
+        const name=T("span",country.name);name.className="comparison-country";
+        const value=T("span",entry.last?entry.last.value.toFixed(1):"—");
+        value.className="comparison-end";
+        const delta=T("span",signedPoints(entry.change));
+        delta.className="comparison-change";
+        if(entry.change>0)delta.className+=" positive";
+        if(entry.change<0)delta.className+=" negative";
+        col.append(name,value,delta);pair.append(col);
+      }
+      card.append(pair);
+      const gap=T("span",row.gap===null
+        ?"Change comparison unavailable for these dates"
+        :"Difference between changes: "+signedPoints(row.gap));
+      gap.className="comparison-gap";
+      card.append(gap);
+      card.addEventListener("click",()=>onSelect(row.code));
+      grid.append(card);
+    }
+    target.append(grid);
+    const caveat=T("p","Each large number is the WGI score in "+state.to+" (0–100). Smaller figures show the change in score points since "+state.from+". The difference between changes is calculated as "+first.name+" minus "+second.name+". Missing endpoints are never interpolated. These are governance estimates, not causal findings or statistical significance tests.");
+    caveat.className="comparison-intro";target.append(caveat);
+  }
+
   function setupExplore(data){
     const section=document.querySelector("#explore .card");
     if(!section)return;
@@ -328,9 +432,26 @@
         periodState.from!==null&&periodState.to!==null
           ?{from:periodState.from,to:periodState.to}:null);
     };
-    const compare=()=>chart(document.querySelector("#compare .plot"),data,
-      [...new Set([ds[0].value,ds[1].value])].map((iso,i)=>[iso,data.countries[iso].name,i?"#c6a8ec":"#79d8b4"]),
-      comparisonIndicator.value);
+    const comparisonState={iso:null,from:null,to:null};
+    const compare=()=>{
+      const firstIso=ds[0].value,secondIso=ds[1].value;
+      const overview=document.querySelector("#compare-overview");
+      const plot=document.querySelector("#compare .plot");
+      compareOverview(overview,data,firstIso,secondIso,comparisonIndicator.value,code=>{
+        comparisonIndicator.value=code;
+        compare();
+      },comparisonState,compare);
+      if(firstIso===secondIso){
+        plot.textContent="Select two different countries to view their historical comparison.";
+        return;
+      }
+      const period=comparisonState.from!==null&&comparisonState.to!==null
+        ?{from:comparisonState.from,to:comparisonState.to}:null;
+      chart(plot,data,
+        [[firstIso,data.countries[firstIso].name,"#79d8b4"],
+         [secondIso,data.countries[secondIso].name,"#c6a8ec"]],
+        comparisonIndicator.value,period);
+    };
     for(const el of cs)el.addEventListener("change",country);
     for(const el of [...ds,comparisonIndicator])el.addEventListener("change",compare);
     country();compare();
