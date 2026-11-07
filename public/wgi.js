@@ -14,12 +14,12 @@
     }));
   };
   const codes = ["RL","GE","CC","VA","RQ","PV"];
-  function chart(target, data, names, ind) {
+  function chart(target, data, names, ind, period=null) {
     target.replaceChildren();
     const series = names.map(n=>({
       iso:n[0], name:n[1], color:n[2],
       points:(data.countries[n[0]]?.indicators[ind]||[])
-        .filter(p=>Number.isInteger(p.year)&&Number.isFinite(p.value)&&p.value>=0&&p.value<=100)
+        .filter(p=>Number.isInteger(p.year)&&Number.isFinite(p.value)&&p.value>=0&&p.value<=100&&(!period||(p.year>=period.from&&p.year<=period.to)))
         .sort((a,b)=>a.year-b.year)
     })).filter(n=>n.points.length);
     if(!series.length){target.textContent="No verified observations for this selection.";return;}
@@ -28,7 +28,7 @@
     const W=700,H=310, l=52, r=18, t=19, b=46;
     const x=v=>l+(v-min)/span*(W-l-r);
     const y=v=>t+(100-v)/100*(H-t-b);
-    const head=T("p",data.indicators[ind]+" · WGI governance score (0–100)");
+    const head=T("p",data.indicators[ind]+" · WGI governance score (0–100)"+(period?" · "+period.from+"–"+period.to:""));
     head.style.fontWeight="700";
     const plot=S("svg",{
       viewBox:"0 0 "+W+" "+H,
@@ -65,49 +65,144 @@
     target.append(head,legend,plot,note,source);
   }
 
-  function countryOverview(target, data, iso, selectedCode, onSelect) {
+  function observedYears(country) {
+    const valid=p=>Number.isInteger(p.year)&&Number.isFinite(p.value)&&p.value>=0&&p.value<=100;
+    const sets=codes.map(code=>new Set((country.indicators[code]||[]).filter(valid).map(p=>p.year)));
+    const common=[...sets[0]].filter(y=>sets.every(s=>s.has(y))).sort((a,b)=>a-b);
+    if(common.length>=2)return common;
+    // For incomplete national coverage, show actual observations and omit
+    // dimensions without both endpoints from the comparative ranking.
+    return [...new Set(sets.flatMap(s=>[...s]))].sort((a,b)=>a-b);
+  }
+
+  function selectDefaultPeriod(years, state, iso) {
+    if(state.iso===iso&&years.includes(state.from)&&years.includes(state.to)&&state.from<state.to)return;
+    state.iso=iso;
+    state.to=years[years.length-1]??null;
+    if(years.length<2){state.from=null;return;}
+    const earlier=years.filter(y=>y<state.to);
+    const target=state.to-10;
+    state.from=earlier.reduce((best,y)=>Math.abs(y-target)<Math.abs(best-target)?y:best,earlier[0]);
+  }
+
+  function periodDifferences(country,from,to) {
+    return codes.map((code,index)=>{
+      const series=country.indicators[code]||[];
+      const first=series.find(p=>p.year===from&&Number.isFinite(p.value));
+      const last=series.find(p=>p.year===to&&Number.isFinite(p.value));
+      const raw=first&&last?last.value-first.value:null;
+      // Ranking uses the same one-decimal precision shown to visitors.
+      const change=raw===null?null:Math.round(raw*10)/10;
+      return {code,index,first,last,change:change===0?0:change};
+    });
+  }
+
+  function countryOverview(target,data,iso,selectedCode,onSelect,state,onPeriodChange) {
     if(!target)return;
-    const country = data.countries[iso];
+    const country=data.countries[iso];
     target.replaceChildren();
     if(!country)return;
+    const years=observedYears(country);
+    selectDefaultPeriod(years,state,iso);
     const heading=T("h3",country.name+" · Institutional profile");
-    const intro=T("p","Six World Bank WGI dimensions. Scores are 0–100; each dimension shows its own latest observation and, where available, a ten-year change in score points.");
+    const intro=T("p","Explore the six World Bank WGI dimensions across the same selected years. Scores run from 0 to 100; comparisons use observed values only.");
     intro.className="overview-intro";
+    target.append(heading,intro);
+
+    if(state.from===null||state.to===null){
+      const missing=T("p","There are not enough verified observations to compare periods for this country.");
+      missing.className="overview-intro";
+      target.append(missing);
+      return;
+    }
+
+    const controls=document.createElement("div");
+    controls.className="period-controls";
+    function yearControl(title,selected,allowed,onChange){
+      const label=document.createElement("label");
+      label.append(T("span",title));
+      const select=document.createElement("select");
+      options(select,allowed.map(year=>[String(year),String(year)]));
+      select.value=String(selected);
+      select.addEventListener("change",()=>{onChange(Number(select.value));onPeriodChange();});
+      label.append(select);
+      controls.append(label);
+    }
+    yearControl("From year",state.from,years.filter(y=>y<state.to),year=>{state.from=year;});
+    yearControl("To year",state.to,years.filter(y=>y>state.from),year=>{state.to=year;});
+    const detail=T("span",String(state.to-state.from)+" calendar years · identical endpoints for all dimensions");
+    detail.className="period-detail";
+    controls.append(detail);
+    target.append(controls);
+
+    const rows=periodDifferences(country,state.from,state.to);
     const grid=document.createElement("div");
     grid.className="metric-grid";
-    for(const code of codes) {
-      const series=(country.indicators[code]||[]).filter(p=>
-        Number.isInteger(p.year)&&Number.isFinite(p.value)&&p.value>=0&&p.value<=100
-      ).sort((a,b)=>a.year-b.year);
-      const latest=series.length ? series[series.length-1] : null;
-      const baseline=latest ? series.find(p=>p.year===latest.year-10) : null;
+    for(const row of rows) {
       const metric=document.createElement("button");
       metric.type="button";
       metric.className="metric";
-      metric.setAttribute("aria-pressed",String(code===selectedCode));
-      metric.append(T("span",data.indicators[code]||code));
-      metric.firstChild.className="metric-name";
-      const value=T("span",latest ? latest.value.toFixed(1) : "—");
+      metric.setAttribute("aria-pressed",String(row.code===selectedCode));
+      const label=T("span",data.indicators[row.code]||row.code);
+      label.className="metric-name";
+      const value=T("span",row.last?row.last.value.toFixed(1):"—");
       value.className="metric-value";
-      metric.append(value);
-      const yearLabel=T("span",latest ? "WGI score · "+latest.year+" · 0–100" : "No verified observations");
+      const yearLabel=T("span",row.last?"WGI score · "+state.to+" · 0–100":"No observation for "+state.to);
       yearLabel.className="metric-meta";
-      metric.append(yearLabel);
-      const change=baseline ? latest.value-baseline.value : null;
-      const shownChange=change===null ? null : Math.round(change*10)/10;
-      const delta=T("span",baseline
-        ? (shownChange>0?"+":"")+shownChange.toFixed(1)
-          +" points · "+baseline.year+"–"+latest.year
-        : "Ten-year change unavailable");
-      delta.className="metric-delta "+(change===null||Math.abs(change)<0.05?"flat":change>0?"up":"down");
-      metric.append(delta);
-      metric.addEventListener("click",()=>onSelect(code));
+      const delta=T("span",row.change===null
+        ?"Change unavailable for selected years"
+        :(row.change>0?"+":"")+row.change.toFixed(1)+" points · "+state.from+"–"+state.to);
+      delta.className="metric-delta "+(row.change===null||row.change===0?"flat":row.change>0?"up":"down");
+      metric.append(label,value,yearLabel,delta);
+      metric.addEventListener("click",()=>onSelect(row.code));
       grid.append(metric);
     }
-    const caveat=T("p","Changes describe estimated governance scores, not statistical significance, causes, overall democracy, or societal resilience. Select a dimension to see its historical series.");
+    target.append(grid);
+
+    const ranking=document.createElement("section");
+    ranking.className="period-ranking";
+    const rankingTitle=T("h4","Largest institutional changes · "+state.from+"–"+state.to);
+    ranking.append(rankingTitle);
+    const comparable=rows.filter(r=>r.change!==null)
+      .sort((a,b)=>Math.abs(b.change)-Math.abs(a.change)||a.index-b.index);
+    const context=T("p","Ranked by absolute change in WGI score points, not by relative importance, statistical significance or impact. Increases and decreases are shown separately.");
+    context.className="overview-intro";
+    ranking.append(context);
+    const max=Math.max(.1,...comparable.map(r=>Math.abs(r.change)));
+    const barList=document.createElement("div");
+    barList.className="change-list";
+    for(const row of comparable){
+      const barRow=document.createElement("div");
+      barRow.className="change-row";
+      const label=T("span",data.indicators[row.code]||row.code);
+      label.className="change-name";
+      const rail=document.createElement("div");
+      rail.className="change-rail";
+      const fill=document.createElement("div");
+      fill.className="change-fill "+(row.change<0?"decrease":"increase");
+      fill.style.width=(100*Math.abs(row.change)/max).toFixed(1)+"%";
+      rail.append(fill);
+      const number=T("span",(row.change>0?"+":"")+row.change.toFixed(1));
+      number.className="change-number";
+      barRow.append(label,rail,number);
+      barList.append(barRow);
+    }
+    if(comparable.length===0){
+      const noData=T("p","No dimensions have observations for both selected years.");
+      noData.className="overview-intro";
+      ranking.append(noData);
+    } else {
+      ranking.append(barList);
+    }
+    if(comparable.length<codes.length){
+      const excluded=T("p",(codes.length-comparable.length)+" dimension(s) excluded: data missing for one or both selected years.");
+      excluded.className="overview-intro";
+      ranking.append(excluded);
+    }
+    const caveat=T("p","Source: World Bank WGI (2026 update). Differences are between exactly the years shown, with no interpolated values. Scores represent governance estimates, not a combined index of democracy or resilience.");
     caveat.className="overview-intro";
-    caveat.style.marginTop="14px";
-    target.append(heading,intro,grid,caveat);
+    ranking.append(caveat);
+    target.append(ranking);
   }
 
   function setupExplore(data){
@@ -219,6 +314,7 @@
     const comparisonIndicator=document.createElement("select");
     options(comparisonIndicator,inds);label.append(comparisonIndicator);
     document.querySelector("#compare .formrow").append(label);
+    const periodState={iso:null,from:null,to:null};
     const country=()=>{
       const iso=cs[0].value;
       const record=data.countries[iso];
@@ -226,9 +322,11 @@
       countryOverview(document.querySelector("#country-overview"),data,iso,cs[1].value,code=>{
         cs[1].value=code;
         country();
-      });
+      },periodState,country);
       chart(document.querySelector("#countries .plot"),data,
-        [[iso,record.name,"#79d8b4"]],cs[1].value);
+        [[iso,record.name,"#79d8b4"]],cs[1].value,
+        periodState.from!==null&&periodState.to!==null
+          ?{from:periodState.from,to:periodState.to}:null);
     };
     const compare=()=>chart(document.querySelector("#compare .plot"),data,
       [...new Set([ds[0].value,ds[1].value])].map((iso,i)=>[iso,data.countries[iso].name,i?"#c6a8ec":"#79d8b4"]),
