@@ -47,6 +47,7 @@ class FrontendDeploymentTests(unittest.TestCase):
         (self.site / "public/wgi.js").write_text("NEW WEB JS")
         (self.site / "public/vdem.js").write_text("NEW V-DEM UI")
         (self.site / "public/relations.js").write_text("NEW CONNECTIONS UI")
+        (self.site / "public/contact.js").write_text("NEW CONTACT FORM UI")
         (self.site / "public/assets/mondoskopo-globe.webp").write_bytes(b"globe")
         (self.site / "public/assets/favicon-32.png").write_bytes(b"icon")
         (self.site / "public/data/wgi.json").write_text('{"version":"OLD_CHECKOUT"}')
