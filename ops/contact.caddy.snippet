@@ -1,0 +1,5 @@
+# Inside the existing mondoskopo.org Caddy site block.
+# Must be installed only after confirming the existing /etc/caddy/Caddyfile layout.
+# Exact paths and only localhost contact relay; do NOT expose port 8765 publicly.
+@mondoskopo_contact path /api/contact /api/contact/health
+reverse_proxy @mondoskopo_contact 127.0.0.1:8765
