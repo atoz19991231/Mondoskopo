@@ -125,6 +125,15 @@ footer a{color:#9bdcbc;text-underline-offset:3px}
 .comparison-card .positive{color:#c7f2d8}
 .comparison-card .negative{color:#f1c5a5}
 @media(max-width:660px){.comparison-grid{grid-template-columns:1fr}.comparison-card{padding:14px}}
+
+/* Global exploration selected country / touch interaction */
+.explore-selection{margin:18px 0 16px;padding:16px 19px;border:1px solid #507760;border-radius:13px;background:#1d392a}
+.explore-country-name{font-size:19px;color:#f0faf1;margin:0 0 8px}
+.explore-country-values{font-size:14px;color:#d2ead9;line-height:1.7;margin:0}
+.explore-open-country{font:inherit;font-size:13px;font-weight:700;color:#10291c;background:#a4e0bd;border:1px solid #b6e6c8;border-radius:8px;padding:10px 14px;margin-top:14px;cursor:pointer}
+.explore-open-country:hover,.explore-open-country:focus-visible{background:#d1f3da}
+#explore .plot svg circle[role="button"]:focus-visible{outline:none;stroke:#ffd28a;stroke-width:3}
+@media(max-width:600px){.explore-selection{padding:14px}.explore-country-values{font-size:13px}#explore .formrow label{flex:1 1 155px}#explore select{width:100%;min-width:0}}
 </style>
 </head>
 <body>
@@ -156,4 +165,4 @@ function show(name){document.querySelectorAll('[data-tab]').forEach(b=>b.setAttr
 document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.tab)));
 document.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.open)));
 const hash=location.hash.slice(1);if(['countries','compare','explore'].includes(hash))show(hash);
-</script><script src="wgi.js?v=compare-20261107-1" defer></script></body></html>
+</script><script src="wgi.js?v=explore-20261107-1" defer></script></body></html>
