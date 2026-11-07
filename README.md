@@ -124,3 +124,30 @@ The horizontal axis always shows a selected V-Dem democracy index on its 0–1 s
 The global plot is descriptive. Neither an apparent relationship across countries nor a selected country's movement through time establishes causality. The datasets differ in their definitions, provenance, uncertainty treatment, release history and geographic coverage. Mondoskopo does not combine the axes into a synthetic overall index or treat these values as directly equivalent. The displayed source and licensing attribution must accompany the adapted V-Dem-derived data under CC BY-SA 4.0.
 
 To publish a frontend change: `cd ~/mondoskopo-deploy/site && git pull --ff-only && python3 -m unittest discover -s tests -v && bash deploy.sh`. This deploy copies `relations.js` but **does not** overwrite either the live WGI or V-Dem data file.
+
+## Contact form: private Proton mailbox, no public address
+
+Contact is a static HTML form backed by a **separate local-only** Python SMTP relay (`ops/contact_api.py`). The form exposes neither the SMTP sender/recipient address nor the token to visitors. The browser only calls same-origin `/api/contact` via HTTPS. The contact button remains disabled until `/api/contact/health` responds; a successful message is shown only after the SMTP server accepts the email. The form has a honeypot, required reply address and message, size limits, a strict browser Origin check, per-client and global throttling, and no file-backed contact-message database. Failures never display SMTP configuration or server details.
+
+Proton currently supports SMTP submission for paid Mail plans with active custom-domain addresses. Use **a dedicated SMTP token**, not your Proton login password. Host is `smtp.protonmail.ch`, port `587`, STARTTLS. SMTP sending is not end-to-end encrypted; Proton says messages are stored with zero-access encryption in the recipient mailbox. This is separate from receiving via Proton Bridge. See the [official Proton SMTP setup instructions](https://proton.me/support/smtp-submission).
+
+**Preparation only** (does not start anything, expose credentials or change your Caddy configuration):
+
+```bash
+cd ~/mondoskopo-deploy/site && git pull --ff-only && python3 -m unittest discover -s tests -v && bash deploy.sh && sudo bash ops/prepare_contact.sh
+```
+
+Create the SMTP token under Proton Mail Settings → All settings → IMAP/SMTP → SMTP tokens. Enter the custom-domain sender address, token, and recipient email **locally** in `/etc/mondoskopo/contact.env`. That file is owned by root, mode 0600 and **must never be copied to GitHub or shared in chat**. Use `sudoedit /etc/mondoskopo/contact.env` or another private terminal editor. The `ops/contact.env.example` file is only a placeholder template.
+
+Before enabling the service, inspect `/etc/caddy/Caddyfile`. Add the exact-match Caddy route from `ops/contact.caddy.snippet` **inside the existing `mondoskopo.org` site block**. Do not blindly replace the current Caddyfile or disrupt existing static files. Validate configuration with `sudo caddy validate --config /etc/caddy/Caddyfile` before `sudo systemctl reload caddy`. The application listens **only on 127.0.0.1:8765**, not a public port.
+
+Once the private environment and verified Caddy route exist, start the backend:
+
+```bash
+sudo systemctl enable --now mondoskopo-contact.service
+sudo systemctl status mondoskopo-contact.service --no-pager
+```
+
+Confirm the health check at `https://mondoskopo.org/api/contact/health`, then submit a test message from the form and verify it arrives in the configured Proton inbox. Until the backend route is active, the website shows the contact form with its submit button disabled and a clear unavailable message. Contact content is only sent as mail, not retained in server-side files, but email messages live in the recipient mailbox and must be managed there. Avoid sending sensitive personal information.
+
+Use `sudo journalctl -u mondoskopo-contact.service -n 30 --no-pager` to check startup, but the service does not log visitor addresses or contact message bodies. The existing WGI monthly timer and V-Dem publisher are unaffected by this service.
