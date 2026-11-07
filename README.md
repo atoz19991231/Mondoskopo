@@ -83,3 +83,11 @@ The selected-year interval is reused in the two-country chart. Source records ar
 The Explore scatterplot displays two individual WGI governance scores for a single source year. Visitors can select the two axes and year, choose a country or territory from the accessible selector, or tap its plotted point. The selected country is highlighted and its exact pair of observed WGI scores is presented in a separate panel with a link to its country profile.
 
 Only countries with observed values for both chosen indicators and the chosen year appear as dots. The panel explicitly reports unavailable pairs; no placeholder scores or interpolated data are displayed. Countries remain labeled in original World Bank geography terminology and associations are not interpreted as causation. Inputs and selected markers work without external map dependencies.
+
+## Explore time slider
+
+Explore has a touch-friendly year slider synchronized with the existing year dropdown. The slider visits **only recorded WGI observation years** (the earlier series includes gaps) rather than converting every integer year into a fabricated reading. Dragging the slider updates the global scatterplot, the source-year label, and the selected country's two indicator values.
+
+The selected country has an amber trajectory through its actual paired X/Y observations up to the selected year. A dotted path connects consecutive *observed* positions, but does not estimate unobserved years. When the selected country lacks a pair in the selected year, the detail panel reports that fact rather than filling values. Visitors can select countries by tapping points, using the country dropdown, or following the country-profile link.
+
+No automatic playback runs in the background. Animations and additional datasets can be considered after performance is checked on a real mobile device.
