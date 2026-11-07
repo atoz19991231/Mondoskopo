@@ -32,7 +32,7 @@ bash deploy.sh
 
 The first WGI fetch requires internet access and uses only the Python standard library. If the World Bank endpoint fails, the script fails and keeps the previously published data untouched. When data is present, Countries and Compare show interactive source-attributed time series for the available economies. Explore visualizes pairs of WGI dimensions within a single year, with one point per economy. This exploratory association is not a causal estimate.
 
-No automatic refresh job is active yet. In a later phase, schedule the import, validate the newly downloaded series, and deploy only verified updates.
+Monthly updates are supported by the Netcup systemd timer described below. The timer must be installed and enabled separately.
 
 WGI metrics are perception-based estimates of governance dimensions, **not** direct measures of democracy, societal resilience, or individual human capabilities. To avoid time-series discontinuities, use the WGI 2026 release, with historical scores revised consistently back to 1996.
 
@@ -61,3 +61,11 @@ sudo systemctl status mondoskopo-wgi.service --no-pager
 If a fetch, validation or comparison fails, the existing publicly served data file remains intact, and the failure is logged in the system journal. Each successful refresh backs up the previously served JSON to `/var/backups/mondoskopo`. The timer runs monthly (on the first of each month, with up to 30 minutes random delay) and catches up after server downtime if necessary.
 
 Important: The timer does *not* deploy changes to the HTML or JS application; frontend updates remain deliberate releases.
+
+## Country period analysis
+
+The Countries view lets visitors choose two actual observation years from the World Bank WGI dataset. It uses years shared across all six dimensions wherever at least two shared years are available; for incomplete series, it offers actual observed years and explicitly marks indicators whose endpoints are missing.
+
+The default interval is approximately ten years ending with the most recent available observation. It picks an existing earlier observation rather than inventing a missing year. Each of the six country cards displays the score from the selected end year (or “not available”) and the change in **WGI score points** from the selected start year. The ranking sorts comparable indicators by **absolute** change on the same years; direction is labelled increase/decrease, not good/bad, and absent endpoint data are excluded. The history plot follows the selected interval. No composite governance index or statistical significance inference is generated.
+
+The frontend uses a versioned script URL in `public/index.html` so that after deployment browsers do not silently use an older cached JS bundle.
