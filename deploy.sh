@@ -13,6 +13,8 @@ test -s "$BASE/public/vdem.js" || { echo "Missing V-Dem UI module" >&2; exit 1; 
 sudo install -m 644 "$BASE/public/vdem.js" "$TARGET/vdem.js"
 test -s "$BASE/public/relations.js" || { echo "Missing Connections UI module" >&2; exit 1; }
 sudo install -m 644 "$BASE/public/relations.js" "$TARGET/relations.js"
+test -s "$BASE/public/contact.js" || { echo "Missing contact form script" >&2; exit 1; }
+sudo install -m 644 "$BASE/public/contact.js" "$TARGET/contact.js"
 test -s "$BASE/public/assets/mondoskopo-globe.webp" || { echo "Missing Mondoskopo transparent globe" >&2; exit 1; }
 test -s "$BASE/public/assets/favicon-32.png" || { echo "Missing Mondoskopo favicon" >&2; exit 1; }
 sudo install -d -m 755 "$TARGET/assets"
