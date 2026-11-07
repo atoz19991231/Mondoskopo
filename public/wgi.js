@@ -379,7 +379,8 @@
       T("span","Drag to move through observed years"),
       T("span",String(yearValues[yearValues.length-1]??"")));
     timeline.append(timelineHead,slider,yearExtent);
-    section.insertBefore(timeline,line);
+    // Position the year control directly below the complete scatterplot.
+    section.append(timeline);
 
     const countryDetail=document.createElement("div");
     countryDetail.className="explore-selection";
