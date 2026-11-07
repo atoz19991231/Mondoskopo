@@ -58,7 +58,7 @@
       label.style.color=s.color;label.style.fontWeight="700";
       legend.append(label);
     }
-    const note=T("p","Source: World Bank Worldwide Governance Indicators, 2026 update. These perception-based governance estimates are not measures of democracy or societal resilience. Missing years are left as gaps.");
+    const note=T("p","Source: World Bank Worldwide Governance Indicators. These perception-based governance estimates are not measures of democracy or societal resilience. Missing years are left as gaps.");
     note.style.cssText="color:#a7c6b5;font-size:12px;line-height:1.6";
     const source=T("p","Retrieved "+data.source.retrieved_utc.slice(0,10)+" · CC BY 4.0 · WGI scores, not percentiles.");
     source.style.cssText="color:#a7c6b5;font-size:12px";
@@ -199,7 +199,7 @@
       excluded.className="overview-intro";
       ranking.append(excluded);
     }
-    const caveat=T("p","Source: World Bank WGI (2026 update). Differences are between exactly the years shown, with no interpolated values. Scores represent governance estimates, not a combined index of democracy or resilience.");
+    const caveat=T("p","Source: World Bank WGI. Differences are between exactly the years shown, with no interpolated values. Scores represent governance estimates, not a combined index of democracy or resilience.");
     caveat.className="overview-intro";
     ranking.append(caveat);
     target.append(ranking);
@@ -508,7 +508,7 @@
       },data.indicators[yCode]+" (0–100)"));
       const title=T("p",points.length+" countries and territories with paired observations · "+year);
       title.style.fontWeight="700";
-      const caveat=T("p","Source: World Bank WGI, 2026 update. The golden trail connects actual observation-year positions of the selected country, with no estimated intervening values. Other points show only countries with both observations in "+year+". These are governance estimates, not causal findings. Retrieved: "+data.source.retrieved_utc.slice(0,10)+".");
+      const caveat=T("p","Source: World Bank WGI. The golden trail connects actual observation-year positions of the selected country, with no estimated intervening values. Other points show only countries with both observations in "+year+". These are governance estimates, not causal findings. Retrieved: "+data.source.retrieved_utc.slice(0,10)+".");
       caveat.style.cssText="font-size:12px;color:#a7c6b5;line-height:1.7";
       line.append(title,plot,caveat);
     }
@@ -608,7 +608,19 @@
       if(countryTab)countryTab.click();
     });
     const note=document.querySelector(".note");
-    if(note)note.textContent="World Bank WGI 2026: "+list.length+" countries and territories with observations. Six dimensions, scores 0–100. V-Dem and other datasets are not yet integrated.";
+    if(note){
+      let latestYear=null;
+      for(const record of Object.values(data.countries))
+        for(const observations of Object.values(record.indicators||{}))
+          for(const p of observations)
+            if(Number.isInteger(p.year)&&(latestYear===null||p.year>latestYear))
+              latestYear=p.year;
+      note.textContent="World Bank WGI: "+list.length+
+        " countries and territories with observations. Six dimensions, scores 0–100."+
+        (latestYear===null?"":" Latest observation year: "+latestYear+".")+
+        " Retrieved: "+data.source.retrieved_utc.slice(0,10)+
+        ". V-Dem and other datasets are not yet integrated.";
+    }
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",setup);
   else setup();
