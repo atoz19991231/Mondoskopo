@@ -18,12 +18,13 @@
   const seriesFor=(country,code)=>country?.indicators?.[code]||[];
   const atYear=(country,code,year)=>seriesFor(country,code).find(p=>p.year===year);
   const format=value=>typeof value==="number"?value.toFixed(3):"—";
-  const delta=(country,code,year)=>{
-    const present=atYear(country,code,year),before=atYear(country,code,year-10);
-    if(!present||!before)return "10-year change unavailable";
+  const delta=(country,code,fromYear,toYear)=>{
+    const before=atYear(country,code,fromYear),present=atYear(country,code,toYear);
+    if(!present||!before)return "Change unavailable for selected years";
     const raw=present.value-before.value;
-    const displayed=Math.round(raw*1000)/1000;
-    return (displayed>0?"+":"")+displayed.toFixed(3)+" since "+(year-10);
+    const rounded=Math.round(raw*1000)/1000;
+    const displayed=rounded===0?0:rounded;
+    return (displayed>0?"+":"")+displayed.toFixed(3)+" · "+fromYear+"–"+toYear;
   };
   function availableYears(a,b){
     const set=country=>new Set(dimensions.flatMap(code=>seriesFor(country,code)
@@ -32,19 +33,19 @@
     const x=set(a),y=set(b);
     return [...x].filter(year=>y.has(year)).sort((p,q)=>p-q);
   }
-  function chart(target,data,isoA,isoB,code,endYear){
+  function chart(target,data,isoA,isoB,code,startYear,endYear){
     target.replaceChildren();
     const pair=[isoA,isoB].map(iso=>data.countries[iso]);
     const observations=pair.map(c=>seriesFor(c,code).filter(p=>
-      Number.isInteger(p.year)&&p.year<=endYear&&Number.isFinite(p.value)
+      Number.isInteger(p.year)&&p.year>=startYear&&p.year<=endYear&&Number.isFinite(p.value)
       &&p.value>=0&&p.value<=1).sort((a,b)=>a.year-b.year));
     const years=observations.flatMap(s=>s.map(p=>p.year));
-    if(!years.length){target.append(T("p","No observations for this index and selected year."));return;}
-    const first=Math.min(...years),last=Math.max(...years),span=Math.max(1,last-first);
+    if(!years.length){target.append(T("p","No observations for this index in "+startYear+"–"+endYear+"."));return;}
+    const first=startYear,last=endYear,span=Math.max(1,last-first);
     const w=740,h=350,left=52,right=18,top=24,bottom=46;
     const x=y=>left+((y-first)/span)*(w-left-right);
     const y=v=>top+(1-v)*(h-top-bottom);
-    const title=T("h4",data.indicators[code]+" · historical comparison (0–1)");
+    const title=T("h4",data.indicators[code]+" · "+startYear+"–"+endYear+" (0–1)");
     const legend=document.createElement("div");legend.className="vdem-legend";
     pair.forEach((country,i)=>{
       const recent=observations[i][observations[i].length-1];
@@ -79,7 +80,7 @@
         svg.append(dot);
       }
     }
-    const caveat=T("p","Only observed years are drawn. The V-Dem 0–1 scale is different from the World Bank WGI 0–100 scale. These are model-based democracy estimates, not a direct assessment of societal resilience.");
+    const caveat=T("p","Only observed years within "+startYear+"–"+endYear+" are drawn. Missing years are not interpolated. V-Dem uses a 0–1 scale, unlike World Bank WGI's 0–100. These are model-based democracy estimates, not a direct assessment of societal resilience.");
     caveat.className="vdem-caveat";
     target.append(title,legend,svg,caveat);
   }
@@ -88,7 +89,7 @@
       .filter(([,country])=>dimensions.some(code=>seriesFor(country,code).length))
       .sort((a,b)=>a[1].name.localeCompare(b[1].name))
       .map(([iso,country])=>[country.name,iso]);
-    let selected="v2x_polyarchy",endYear=null,years=[];
+    let selected="v2x_polyarchy",startYear=null,endYear=null,years=[];
     const form=document.createElement("div");form.className="formrow";
     const choose=(labelText,defaultCode)=>{
       const label=document.createElement("label");label.append(T("span",labelText));
@@ -102,15 +103,30 @@
     const metrics=document.createElement("div");metrics.className="vdem-grid";
     const figure=document.createElement("div");figure.className="plot vdem-plot";
     const timeline=document.createElement("div");timeline.className="explore-timeline";
+    timeline.className="explore-timeline vdem-interval";
     const timelineHeading=document.createElement("div");timelineHeading.className="explore-timeline-head";
-    const headline=T("strong","Observation year");const yearLabel=T("output","—");yearLabel.className="explore-current-year";
-    timelineHeading.append(headline,yearLabel);
-    const scrubber=document.createElement("input");
-    scrubber.type="range";scrubber.className="explore-year-slider";
-    scrubber.setAttribute("aria-label","V-Dem observation year");
-    scrubber.step="1";scrubber.min="0";
+    const headline=T("strong","Selected period");
+    const periodLabel=T("output","—");periodLabel.className="explore-current-year";
+    timelineHeading.append(headline,periodLabel);
+    const makeSlider=(caption,ariaLabel)=>{
+      const row=document.createElement("div");row.className="vdem-range-row";
+      const info=document.createElement("div");info.className="vdem-range-info";
+      const title=T("label",caption);
+      const output=T("output","—");
+      info.append(title,output);
+      const slider=document.createElement("input");
+      slider.type="range";slider.className="explore-year-slider";
+      slider.step="1";slider.min="0";
+      slider.setAttribute("aria-label",ariaLabel);
+      row.append(info,slider);
+      timeline.append(row);
+      return {slider,output};
+    };
+    timeline.append(timelineHeading);
+    const from=makeSlider("Start year","V-Dem start year");
+    const to=makeSlider("End year","V-Dem end year");
     const extent=document.createElement("div");extent.className="explore-year-extent";
-    timeline.append(timelineHeading,scrubber,extent);
+    timeline.append(extent);
     const source=document.createElement("p");source.className="vdem-caveat";
     const citation=document.createElement("a");
     citation.href=data.source.doi;citation.textContent=data.source.citation;
@@ -129,8 +145,11 @@
         metrics.append(T("p","No shared observation years for these selections."));
         figure.replaceChildren();return;
       }
-      yearLabel.textContent=String(endYear);
-      scrubber.setAttribute("aria-valuetext",String(endYear));
+      periodLabel.textContent=startYear+"–"+endYear;
+      from.output.textContent=String(startYear);
+      to.output.textContent=String(endYear);
+      from.slider.setAttribute("aria-valuetext",String(startYear));
+      to.slider.setAttribute("aria-valuetext",String(endYear));
       for(const code of dimensions){
         const card=document.createElement("button");card.type="button";card.className="vdem-metric";
         card.setAttribute("aria-pressed",String(code===selected));
@@ -141,29 +160,58 @@
           const name=T("span",country.name);name.className="vdem-name";
           const current=atYear(country,code,endYear);
           const value=T("span",format(current?.value));value.className="vdem-score";value.style.color=color;
-          const change=T("span",delta(country,code,endYear));change.className="vdem-delta";
+          const change=T("span",delta(country,code,startYear,endYear));change.className="vdem-delta";
           column.append(name,value,change);pair.append(column);
         }
         card.append(head,pair);
         card.addEventListener("click",()=>{selected=code;render();});
         metrics.append(card);
       }
-      chart(figure,data,a.value,b.value,selected,endYear);
+      chart(figure,data,a.value,b.value,selected,startYear,endYear);
+    }
+    function syncSliders(){
+      const max=String(Math.max(0,years.length-1));
+      const enabled=years.length>=2;
+      for(const item of [from,to]){
+        item.slider.max=max;
+        item.slider.disabled=!enabled;
+      }
+      from.slider.value=String(Math.max(0,years.indexOf(startYear)));
+      to.slider.value=String(Math.max(0,years.indexOf(endYear)));
+      extent.replaceChildren(T("span",String(years[0]??"—")),
+        T("span",enabled?"Adjust both ends of the observed interval":"At least two shared observation years are required"),
+        T("span",String(years[years.length-1]??"—")));
     }
     function changeCountries(){
       years=availableYears(data.countries[a.value],data.countries[b.value]);
-      if(!years.includes(endYear))endYear=years[years.length-1]??null;
-      scrubber.max=String(Math.max(0,years.length-1));
-      scrubber.value=String(Math.max(0,years.indexOf(endYear)));
-      extent.replaceChildren(T("span",String(years[0]??"—")),
-        T("span","Drag to compare observed years"),T("span",String(years[years.length-1]??"—")));
+      if(years.length>=2){
+        if(!years.includes(startYear))startYear=years[0];
+        if(!years.includes(endYear))endYear=years[years.length-1];
+        if(startYear>=endYear){
+          startYear=years[0];
+          endYear=years[years.length-1];
+        }
+      }else{
+        startYear=years[0]??null;
+        endYear=years[0]??null;
+      }
+      syncSliders();
       render();
     }
     for(const select of [a,b])select.addEventListener("change",changeCountries);
-    scrubber.addEventListener("input",()=>{
-      const year=years[Number(scrubber.value)];
-      if(year===undefined)return;
-      endYear=year;render();
+    from.slider.addEventListener("input",()=>{
+      const index=Math.min(Number(from.slider.value),years.indexOf(endYear)-1);
+      if(index<0)return;
+      startYear=years[index];
+      from.slider.value=String(index);
+      render();
+    });
+    to.slider.addEventListener("input",()=>{
+      const index=Math.max(Number(to.slider.value),years.indexOf(startYear)+1);
+      if(index>=years.length)return;
+      endYear=years[index];
+      to.slider.value=String(index);
+      render();
     });
     changeCountries();
   }
