@@ -93,3 +93,24 @@ Explore has a touch-friendly year slider synchronized with the existing year dro
 The selected country has an amber trajectory through its actual paired X/Y observations up to the selected year. A dotted path connects consecutive *observed* positions, but does not estimate unobserved years. When the selected country lacks a pair in the selected year, the detail panel reports that fact rather than filling values. Visitors can select countries by tapping points, using the country dropdown, or following the country-profile link.
 
 No automatic playback runs in the background. Animations and additional datasets can be considered after performance is checked on a real mobile device.
+
+## V-Dem: five distinct dimensions of democracy
+
+Mondoskopo's **Democracy** tab is a separate dataset, not a new WGI dimension and not a combined institutional/democracy score. It presents the five V-Dem headline indices on their original **0–1** scale: electoral, liberal, participatory, deliberative, and egalitarian democracy. The two-country view compares the same index within a single V-Dem release, displays observed scores for the chosen year, and plots historical country-year series with a source-year slider below the chart. Users are never shown invented country scores.
+
+The importer uses the official [V-Dem Country-Year Core v16](https://v-dem.net/data/the-v-dem-dataset/country-year-v-dem-core-v16/) (March 2026):
+
+Source ZIP: `https://www.v-dem.net/media/datasets/V-Dem-CY-Core-v16_csv.zip`.
+Expected v16 SHA-256: `9055455c4adacd1ad9e78f1a7f3ac0768bdf26992e7651c0602a43ca7bdd4506`.
+
+The ZIP is about 16 MB; the CSV inside is much larger. Python's built-in zipfile/csv modules **stream the CSV**, only storing the five requested indices and any accompanying model intervals for 1900 onward. It does not expand the archive into a 200+ MB local CSV and does not require R or extra Python libraries. The importer fails without replacing existing staged observations if the download, checksum, structure, score validation, or baseline coverage check fails. First publication of the extracted data is intentionally manual and independent from the active monthly WGI job.
+
+To import on Netcup **after reviewing the version, license, and command**:
+
+```bash
+cd ~/mondoskopo-deploy/site && git pull --ff-only && python3 -m unittest discover -s tests -v && python3 scripts/import_vdem.py && bash ops/publish-vdem.sh && bash deploy.sh
+```
+
+Until the verified V-Dem extract is published to `/var/www/mondoskopo/data/vdem.json`, the Democracy tab shows a clear unavailable-data message, **not** example numbers. Neither the V-Dem importer nor its publisher writes `/var/www/mondoskopo/data/wgi.json`. The frontend deploy installs `vdem.js` but does not replace published V-Dem observations.
+
+V-Dem datasets are licensed **CC BY-SA 4.0**, including commercial use with attribution and ShareAlike conditions. The derived extract and attribution retain this license; [Coppedge et al. (2026), V-Dem Country-Year Dataset v16](https://doi.org/10.23696/vdemds26) is the source citation. Review [V-Dem's FAQ](https://v-dem.net/about/faq/) and cautionary notes before interpreting small differences. V-Dem revises historical values across releases, so **never splice annual rows from v16 and a later release**. Moving to v17 will require explicit review, full-history replacement, versioned metadata and renewed validation; there is no blind V-Dem timer.
