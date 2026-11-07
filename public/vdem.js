@@ -108,25 +108,38 @@
     const headline=T("strong","Selected period");
     const periodLabel=T("output","—");periodLabel.className="explore-current-year";
     timelineHeading.append(headline,periodLabel);
-    const makeSlider=(caption,ariaLabel)=>{
-      const row=document.createElement("div");row.className="vdem-range-row";
-      const info=document.createElement("div");info.className="vdem-range-info";
-      const title=T("label",caption);
-      const output=T("output","—");
-      info.append(title,output);
-      const slider=document.createElement("input");
-      slider.type="range";slider.className="explore-year-slider";
-      slider.step="1";slider.min="0";
-      slider.setAttribute("aria-label",ariaLabel);
-      row.append(info,slider);
-      timeline.append(row);
-      return {slider,output};
+    const interval=document.createElement("div");
+    interval.className="vdem-dual-slider";
+    const rail=document.createElement("div");
+    rail.className="vdem-dual-track";
+    const activeRail=document.createElement("div");
+    activeRail.className="vdem-dual-fill";
+    rail.append(activeRail);
+    const slider=(name)=>{
+      const input=document.createElement("input");
+      input.type="range";input.className="vdem-dual-input";
+      input.setAttribute("aria-label",name);
+      input.step="1";input.min="0";
+      interval.append(input);
+      return input;
     };
-    timeline.append(timelineHeading);
-    const from=makeSlider("Start year","V-Dem start year");
-    const to=makeSlider("End year","V-Dem end year");
+    const from=slider("V-Dem start year");
+    const to=slider("V-Dem end year");
+    interval.prepend(rail);
+    const legends=document.createElement("div");
+    legends.className="vdem-dual-legends";
+    const fromOutput=T("output","—");
+    const toOutput=T("output","—");
+    legends.append(fromOutput,toOutput);
     const extent=document.createElement("div");extent.className="explore-year-extent";
-    timeline.append(extent);
+    timeline.append(timelineHeading,interval,legends,extent);
+    const updateRail=()=>{
+      const n=Math.max(1,years.length-1);
+      const left=(100*Math.max(0,years.indexOf(startYear))/n);
+      const right=(100*Math.max(0,years.indexOf(endYear))/n);
+      activeRail.style.left=left+"%";
+      activeRail.style.width=Math.max(0,right-left)+"%";
+    };
     const source=document.createElement("p");source.className="vdem-caveat";
     const citation=document.createElement("a");
     citation.href=data.source.doi;citation.textContent=data.source.citation;
@@ -146,15 +159,16 @@
         metrics.append(T("p",message));
         figure.replaceChildren(T("p",message));
         periodLabel.textContent="—";
-        from.output.textContent="—";
-        to.output.textContent="—";
+        fromOutput.textContent="—";
+        toOutput.textContent="—";
         return;
       }
       periodLabel.textContent=startYear+"–"+endYear;
-      from.output.textContent=String(startYear);
-      to.output.textContent=String(endYear);
-      from.slider.setAttribute("aria-valuetext",String(startYear));
-      to.slider.setAttribute("aria-valuetext",String(endYear));
+      fromOutput.textContent="Start: "+startYear;
+      toOutput.textContent="End: "+endYear;
+      from.setAttribute("aria-valuetext",String(startYear));
+      to.setAttribute("aria-valuetext",String(endYear));
+      updateRail();
       for(const code of dimensions){
         const card=document.createElement("button");card.type="button";card.className="vdem-metric";
         card.setAttribute("aria-pressed",String(code===selected));
@@ -177,12 +191,13 @@
     function syncSliders(){
       const max=String(Math.max(0,years.length-1));
       const enabled=years.length>=2;
-      for(const item of [from,to]){
-        item.slider.max=max;
-        item.slider.disabled=!enabled;
+      for(const input of [from,to]){
+        input.max=max;
+        input.disabled=!enabled;
       }
-      from.slider.value=String(Math.max(0,years.indexOf(startYear)));
-      to.slider.value=String(Math.max(0,years.indexOf(endYear)));
+      from.value=String(Math.max(0,years.indexOf(startYear)));
+      to.value=String(Math.max(0,years.indexOf(endYear)));
+      updateRail();
       extent.replaceChildren(T("span",String(years[0]??"—")),
         T("span",enabled?"Adjust both ends of the observed interval":"At least two shared observation years are required"),
         T("span",String(years[years.length-1]??"—")));
@@ -204,18 +219,18 @@
       render();
     }
     for(const select of [a,b])select.addEventListener("change",changeCountries);
-    from.slider.addEventListener("input",()=>{
-      const index=Math.min(Number(from.slider.value),years.indexOf(endYear)-1);
+    from.addEventListener("input",()=>{
+      const index=Math.min(Number(from.value),years.indexOf(endYear)-1);
       if(index<0)return;
       startYear=years[index];
-      from.slider.value=String(index);
+      from.value=String(index);
       render();
     });
-    to.slider.addEventListener("input",()=>{
-      const index=Math.max(Number(to.slider.value),years.indexOf(startYear)+1);
+    to.addEventListener("input",()=>{
+      const index=Math.max(Number(to.value),years.indexOf(startYear)+1);
       if(index>=years.length)return;
       endYear=years[index];
-      to.slider.value=String(index);
+      to.value=String(index);
       render();
     });
     changeCountries();
