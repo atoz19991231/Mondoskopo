@@ -111,7 +111,7 @@ def main() -> None:
     data = {
         "source": {
             "name": "World Bank Worldwide Governance Indicators",
-            "release": "2026 update (methodology revised in 2025)",
+            "release": "World Bank WGI API snapshot (retrieval timestamp below)",
             "url": "https://www.worldbank.org/en/publication/worldwide-governance-indicators",
             "api": SOURCE,
             "license": "CC BY 4.0",
