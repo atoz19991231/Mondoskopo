@@ -149,13 +149,37 @@ footer a{color:#9bdcbc;text-underline-offset:3px}
 .explore-year-extent{display:flex;justify-content:space-between;align-items:center;gap:8px;color:#c4d8cb;font-size:12px;line-height:1.5}
 .explore-year-extent span:nth-child(2){text-align:center}
 @media(max-width:600px){.explore-timeline{padding:14px 12px 9px}.explore-current-year{font-size:29px}.explore-year-extent span:nth-child(2){font-size:11px}}
+
+/* V-Dem: a distinct democracy dataset, with source-aware 0–1 scales */
+.feature-cards{grid-template-columns:repeat(4,minmax(0,1fr))}
+#vdem-app{margin:22px 0 0}
+.vdem-intro{color:#c1d7c9;font-size:14px;line-height:1.7}
+.vdem-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:22px 0}
+.vdem-metric{background:#1f3a2e;border:1px solid #456757;padding:17px;border-radius:13px;color:#eff9f2;text-align:left;cursor:pointer}
+.vdem-metric:hover,.vdem-metric:focus-visible{background:#28503c;border-color:#97d7b1}
+.vdem-metric[aria-pressed=true]{border-color:#b9f2ca;box-shadow:inset 0 0 0 1px #a3e7be}
+.vdem-metric-name{display:block;color:#f1fcf4;font-size:15px;line-height:1.35;margin-bottom:12px}
+.vdem-pair{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.vdem-column{display:flex;flex-direction:column;gap:8px;min-width:0}
+.vdem-name{font-size:12px;color:#c9decf;overflow-wrap:anywhere}
+.vdem-score{font-weight:750;font-size:27px;line-height:1.1;font-variant-numeric:tabular-nums}
+.vdem-delta{font-size:11px;color:#c0d8c6;line-height:1.45}
+.vdem-plot{margin-top:20px}
+.vdem-plot h4{font-size:17px;font-weight:700;color:#eef8f0;line-height:1.4;margin:0 0 8px}
+.vdem-legend{display:flex;flex-wrap:wrap;gap:18px;font-size:13px;font-weight:700}
+.vdem-caveat{font-size:12px;color:#b4d2be;line-height:1.7;margin-top:13px}
+.vdem-caveat a{color:#a8ead2}
+#vdem-app .explore-timeline{margin-top:14px}
+@media(max-width:1050px){.feature-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){.feature-cards{grid-template-columns:1fr}}
+@media(max-width:600px){.vdem-grid{grid-template-columns:1fr}.vdem-score{font-size:25px}}
 </style>
 </head>
 <body>
 <header><div class="shell"><div class="top"><div class="brand">
 <img src="assets/mondoskopo-globe.webp" alt="" width="100" height="90" decoding="async" />
 <div class="brand-copy"><span class="brand-name">Mondoskopo</span><span class="brand-sub">Observing humanity in motion</span></div></div><div class="tagh">Open data · Independent exploration</div></div>
-<nav aria-label="Main navigation"><button aria-selected="true" data-tab="home">Start</button><button aria-selected="false" data-tab="countries">Countries</button><button aria-selected="false" data-tab="compare">Compare</button><button aria-selected="false" data-tab="explore">Explore</button></nav></div></header>
+<nav aria-label="Main navigation"><button aria-selected="true" data-tab="home">Start</button><button aria-selected="false" data-tab="countries">Countries</button><button aria-selected="false" data-tab="compare">Compare</button><button aria-selected="false" data-tab="explore">Explore</button><button aria-selected="false" data-tab="democracy">Democracy</button></nav></div></header>
 <main class="shell">
 <section id="home" class="home active">
 <div class="hero"><div><p class="eyebrow">A global telescope for human societies</p><h1>See societies<br>in motion.</h1><p class="intro">Explore how institutions and democratic structures evolve across countries and through time. Compare observations. Question explanations. Follow the evidence.</p>
@@ -166,18 +190,24 @@ footer a{color:#9bdcbc;text-underline-offset:3px}
 <g fill="none" stroke="#86b2a3" stroke-width="2"><path d="M101 111 174 94 239 129 311 83 330 194 255 237 151 223 91 192 101 111Z"/><path d="M174 94 151 223 239 129 330 194 91 192 255 237 311 83"/></g>
 <g fill="#fff" stroke="#4a8978" stroke-width="3"><circle cx="101" cy="111" r="8"/><circle cx="174" cy="94" r="7"/><circle cx="239" cy="129" r="10"/><circle cx="311" cy="83" r="8"/><circle cx="330" cy="194" r="9"/><circle cx="255" cy="237" r="7"/><circle cx="151" cy="223" r="8"/><circle cx="91" cy="192" r="7"/></g><circle cx="213" cy="172" r="18" fill="#2a685b"/><circle cx="213" cy="172" r="7" fill="#cbe3da"/>
 </svg><p>Conceptual illustration · Not observed country data</p></div></div>
-<div class="section-intro"><h2>Three ways to explore</h2><p>Start with a country, compare trajectories, or investigate relationships between indicators.</p></div>
-<div class="cards"><button class="card" data-open="countries"><span class="symbol">◉</span><strong>Countries</strong><p>Follow institutions and democratic indicators through time.</p></button><button class="card" data-open="compare"><span class="symbol">≋</span><strong>Compare</strong><p>Put Sweden and Poland side by side, or choose other countries.</p></button><button class="card" data-open="explore"><span class="symbol">✳</span><strong>Explore</strong><p>Look for relationships, while distinguishing correlation from explanation.</p></button></div>
+<div class="section-intro"><h2>Four ways to explore</h2><p>Explore governance, compare countries, investigate relationships, or follow the dimensions of democracy.</p></div>
+<div class="cards feature-cards"><button class="card" data-open="countries"><span class="symbol">◉</span><strong>Countries</strong><p>Follow institutions and democratic indicators through time.</p></button><button class="card" data-open="compare"><span class="symbol">≋</span><strong>Compare</strong><p>Put Sweden and Poland side by side, or choose other countries.</p></button><button class="card" data-open="explore"><span class="symbol">✳</span><strong>Explore</strong><p>Look for relationships, while distinguishing correlation from explanation.</p></button><button class="card" data-open="democracy"><span class="symbol">◎</span><strong>Democracy</strong><p>Follow five dimensions of democracy through time using V-Dem.</p></button></div>
 <div class="cards" style="grid-template-columns:repeat(auto-fit,minmax(250px,1fr));margin-top:17px"><div class="card"><strong>Observation before conclusion</strong><p>Every indicator should retain its source, scale and reference year. We do not invent a single overall stability score.</p></div><div class="card"><strong>Built to grow</strong><p>Democracy and institutions are the starting point. Other societal dimensions will follow as reliable evidence allows.</p></div></div>
 </section>
 <section class="views" id="countries"><div class="card"><p class="eyebrow">COUNTRY PROFILE</p><h2>Countries through time</h2><p>Choose a country to explore institutional change.</p><div class="formrow"><label>Country<select><option>Sweden</option><option>Poland</option></select></label><label>Indicator<select><option>Rule of law</option><option>Government effectiveness</option><option>Voice and accountability</option></select></label></div><div class="country-overview" id="country-overview" aria-live="polite"></div><div class="plot">Country datasets are being prepared. No indicator values are shown until a documented source has been imported and verified.</div></div></section>
 <section class="views" id="compare"><div class="card"><p class="eyebrow">COUNTRY COMPARISON</p><h2>Compare trajectories</h2><p>Compare two countries across the same observed years, using each of the six WGI governance dimensions.</p><div class="formrow"><label>First country<select><option>Sweden</option><option>Poland</option></select></label><label>Second country<select><option>Poland</option><option>Sweden</option></select></label></div><div id="compare-overview" aria-live="polite"></div><div class="plot">Comparative charts will become available once the World Bank WGI observations have been imported. We do not use placeholder statistics.</div></div></section>
 <section class="views" id="explore"><div class="card"><p class="eyebrow">GLOBAL LANDSCAPE</p><h2>Explore relationships</h2><p>Explore associations across countries and years without confusing them with causal explanations.</p><div class="plot">Global scatterplots will become available after source datasets are loaded. Current status: awaiting verified observations.</div></div></section>
+<section class="views" id="democracy"><div class="card">
+<p class="eyebrow">V-DEM · VARIETIES OF DEMOCRACY</p>
+<h2>Five dimensions of democracy</h2>
+<p>Explore how different aspects of democracy have changed. V-Dem data and WGI data remain separately attributed and are never combined into a single score.</p>
+<div id="vdem-app"><p class="vdem-intro">Checking for verified V-Dem Core v16 observations…</p></div>
+</div></section>
 <div class="note">Data status: The website is online. Country-level observations have not yet been published. This is an exploratory platform under development.</div>
-<footer><strong>Sources, methods & privacy</strong><p>Planned primary datasets: <a href="https://www.worldbank.org/en/publication/worldwide-governance-indicators">World Bank Worldwide Governance Indicators</a> and <a href="https://v-dem.net/data/the-v-dem-dataset/">V-Dem</a>. These indicators do not directly measure societal resilience or a population's ability to process complexity.</p><p>No advertising or visitor analytics are active in this release.</p></footer>
+<footer><strong>Sources, methods & privacy</strong><p>Sources: <a href="https://www.worldbank.org/en/publication/worldwide-governance-indicators">World Bank Worldwide Governance Indicators</a> (WGI, CC BY 4.0) and <a href="https://v-dem.net/data/the-v-dem-dataset/">V-Dem Country-Year Core</a> (CC BY-SA 4.0, shown after verified import). They are separate measurement systems; neither directly measures societal resilience or a population's ability to process complexity.</p><p>No advertising or visitor analytics are active in this release.</p></footer>
 </main><script>
 function show(name){document.querySelectorAll('[data-tab]').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.tab===name)));document.querySelectorAll('.home,.views').forEach(s=>s.classList.toggle('active',s.id===name));location.hash=name==='home'?'':name;window.scrollTo({top:0,behavior:'smooth'});}
 document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.tab)));
 document.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.open)));
-const hash=location.hash.slice(1);if(['countries','compare','explore'].includes(hash))show(hash);
-</script><script src="wgi.js?v=data-years-20261107-1" defer></script></body></html>
+const hash=location.hash.slice(1);if(['countries','compare','explore','democracy'].includes(hash))show(hash);
+</script><script src="wgi.js?v=data-years-20261107-1" defer></script><script src="vdem.js?v=democracy-20261107-1" defer></script></body></html>
