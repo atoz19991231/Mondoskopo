@@ -173,6 +173,16 @@ footer a{color:#9bdcbc;text-underline-offset:3px}
 @media(max-width:1050px){.feature-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:760px){.feature-cards{grid-template-columns:1fr}}
 @media(max-width:600px){.vdem-grid{grid-template-columns:1fr}.vdem-score{font-size:25px}}
+
+/* Two independent V-Dem range handles, kept below the historical plot */
+#vdem-app .vdem-interval{padding:18px 20px 15px}
+.vdem-range-row{margin-top:18px}
+.vdem-range-info{display:flex;justify-content:space-between;align-items:center;gap:12px;color:#e4f5e9}
+.vdem-range-info label{font-size:14px;font-weight:650;color:#d7e9dd}
+.vdem-range-info output{font-size:19px;font-weight:750;color:#ffd28a;font-variant-numeric:tabular-nums}
+.vdem-range-row .explore-year-slider{margin:7px 0 2px}
+.vdem-interval .explore-year-extent{margin-top:10px}
+@media(max-width:600px){#vdem-app .vdem-interval{padding:14px 12px}.vdem-range-row{margin-top:16px}}
 </style>
 </head>
 <body>
@@ -210,4 +220,4 @@ function show(name){document.querySelectorAll('[data-tab]').forEach(b=>b.setAttr
 document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.tab)));
 document.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.open)));
 const hash=location.hash.slice(1);if(['countries','compare','explore','democracy'].includes(hash))show(hash);
-</script><script src="wgi.js?v=democracy-20261107-1" defer></script><script src="vdem.js?v=democracy-20261107-1" defer></script></body></html>
+</script><script src="wgi.js?v=democracy-20261107-1" defer></script><script src="vdem.js?v=democracy-interval-20261107-1" defer></script></body></html>
