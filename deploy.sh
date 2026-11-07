@@ -14,7 +14,10 @@ test -s "$BASE/public/assets/favicon-32.png" || { echo "Missing Mondoskopo favic
 sudo install -d -m 755 "$TARGET/assets"
 sudo install -m 644 "$BASE/public/assets/mondoskopo-globe.webp" "$TARGET/assets/mondoskopo-globe.webp"
 sudo install -m 644 "$BASE/public/assets/favicon-32.png" "$TARGET/assets/favicon-32.png"
-if [ -s "$BASE/public/data/wgi.json" ]; then
+# Only bootstrap WGI on first deployment. Subsequent data updates are
+# published by the validated monthly refresh; frontend deploys must not roll
+# that newer live dataset back to the older Git checkout copy.
+if [ ! -e "$TARGET/data/wgi.json" ] && [ -s "$BASE/public/data/wgi.json" ]; then
   sudo install -d -m 755 "$TARGET/data"
   sudo install -m 644 "$BASE/public/data/wgi.json" "$TARGET/data/wgi.json"
 fi
