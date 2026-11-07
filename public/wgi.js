@@ -271,8 +271,11 @@
       return {code:left.code,index,left,right,gap:gap===0?0:gap};
     });
     // Largest difference between changes comes first, ties keep source order.
-    rows.sort((a,b)=>(b.gap===null?-1:a.gap===null?1:
-      Math.abs(b.gap)-Math.abs(a.gap))||a.index-b.index);
+    rows.sort((a,b)=>{
+      if(a.gap===null||b.gap===null)
+        return a.gap===null?(b.gap===null?a.index-b.index:1):-1;
+      return Math.abs(b.gap)-Math.abs(a.gap)||a.index-b.index;
+    });
     const intro=T("p","All six dimensions are compared between "+state.from+" and "+state.to+". Ranked by the absolute difference between the two countries' changes, not by their overall scores.");
     intro.className="comparison-intro";target.append(intro);
     const grid=document.createElement("div");
@@ -443,6 +446,10 @@
       },comparisonState,compare);
       if(firstIso===secondIso){
         plot.textContent="Select two different countries to view their historical comparison.";
+        return;
+      }
+      if(comparisonState.from===null||comparisonState.to===null){
+        plot.textContent="No shared observation period is available for this pair.";
         return;
       }
       const period=comparisonState.from!==null&&comparisonState.to!==null
