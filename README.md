@@ -60,7 +60,9 @@ sudo systemctl status mondoskopo-wgi.service --no-pager
 
 If a fetch, validation or comparison fails, the existing publicly served data file remains intact, and the failure is logged in the system journal. Each successful refresh backs up the previously served JSON to `/var/backups/mondoskopo`. The timer runs monthly (on the first of each month, with up to 30 minutes random delay) and catches up after server downtime if necessary.
 
-Important: The timer does *not* deploy changes to the HTML or JS application; frontend updates remain deliberate releases.
+Important: The timer does *not* deploy changes to the HTML or JS application; frontend updates remain deliberate releases. Conversely, `deploy.sh` installs a bundled WGI snapshot only if no live `wgi.json` exists. An ordinary frontend deployment must **never overwrite** WGI observations already published by the verified monthly refresh.
+
+Offline protection tests: `python3 -m unittest discover -s tests -v`. The publication-safety tests run with temporary data and a fake `sudo` command; they do **not** access the live site or contact the World Bank. To verify that the timer actually runs on Netcup, inspect `systemctl list-timers mondoskopo-wgi.timer --no-pager` and `journalctl -u mondoskopo-wgi.service -n 30 --no-pager`. Neither GitHub nor offline tests alone establish the server's runtime state.
 
 ## Country period analysis
 
