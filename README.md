@@ -96,7 +96,7 @@ No automatic playback runs in the background. Animations and additional datasets
 
 ## V-Dem: five distinct dimensions of democracy
 
-Mondoskopo's **Democracy** tab is a separate dataset, not a new WGI dimension and not a combined institutional/democracy score. It presents the five V-Dem headline indices on their original **0–1** scale: electoral, liberal, participatory, deliberative, and egalitarian democracy. The two-country view compares the same index within a single V-Dem release, displays observed scores for the chosen year, and plots historical country-year series with a source-year slider below the chart. Users are never shown invented country scores.
+Mondoskopo's **Democracy** tab is a separate dataset, not a new WGI dimension and not a combined institutional/democracy score. It presents the five V-Dem headline indices on their original **0–1** scale: electoral, liberal, participatory, deliberative, and egalitarian democracy. The two-country view compares the same index within a single V-Dem release, and plots historical country-year series with two independent start-year and end-year sliders below the chart. Cards show observed end-year scores and changes calculated strictly between the two chosen years. Sliders offer only actual observation years shared by the selected pair (and cannot cross), and the historical lines are restricted to the chosen interval; missing endpoints are explicitly marked unavailable. Users are never shown invented country scores.
 
 The importer uses the official [V-Dem Country-Year Core v16](https://v-dem.net/data/the-v-dem-dataset/country-year-v-dem-core-v16/) (March 2026):
 
