@@ -312,7 +312,7 @@
     caveat.className="comparison-intro";target.append(caveat);
   }
 
-  function setupExplore(data){
+  function setupExplore(data,onOpenCountry){
     const section=document.querySelector("#explore .card");
     if(!section)return;
     const line=section.querySelector(".plot");
@@ -334,30 +334,73 @@
     const years=new Set();
     for(const country of Object.values(data.countries))
       for(const series of Object.values(country.indicators||{}))
-        for(const p of series) years.add(p.year);
+        for(const p of series)
+          if(Number.isInteger(p.year)&&Number.isFinite(p.value))years.add(p.year);
     options(yearSelect,[...years].sort((a,b)=>b-a).map(y=>[String(y),String(y)]));
     yearLabel.append(yearSelect);panel.append(yearLabel);
+
+    const countryLabel=document.createElement("label");
+    countryLabel.append(T("span","Highlight country"));
+    const countrySelect=document.createElement("select");
+    const countryChoices=Object.entries(data.countries)
+      .filter(([,record])=>Object.values(record.indicators||{}).some(s=>s.length))
+      .sort((a,b)=>a[1].name.localeCompare(b[1].name))
+      .map(([iso,record])=>[record.name,iso]);
+    options(countrySelect,countryChoices);
+    countrySelect.value=data.countries.SWE?"SWE":(countryChoices[0]?.[1]||"");
+    countryLabel.append(countrySelect);
+    panel.append(countryLabel);
     section.insertBefore(panel,line);
+    const countryDetail=document.createElement("div");
+    countryDetail.className="explore-selection";
+    countryDetail.setAttribute("aria-live","polite");
+    section.insertBefore(countryDetail,line);
     const info=section.querySelector("p:not(.eyebrow)");
-    if(info)info.textContent="Compare two WGI dimensions for the same observation year. Each point is one country or territory; association does not establish causation.";
+    if(info)info.textContent="Each dot represents one country or territory in a single year. Tap a dot, or choose a country, to see its actual indicator scores. Association does not imply causation.";
+
     function render(){
       const xCode=xIndicator.value,yCode=yIndicator.value,year=+yearSelect.value;
       const points=[];
       for(const [iso,country] of Object.entries(data.countries)){
         const a=(country.indicators[xCode]||[]).find(p=>p.year===year);
         const b=(country.indicators[yCode]||[]).find(p=>p.year===year);
-        if(a&&b)points.push({iso,name:country.name,x:a.value,y:b.value});
+        if(a&&b&&Number.isFinite(a.value)&&Number.isFinite(b.value)
+          &&a.value>=0&&a.value<=100&&b.value>=0&&b.value<=100)
+          points.push({iso,name:country.name,x:a.value,y:b.value});
+      }
+      const selected=countrySelect.value;
+      const selectedPoint=points.find(p=>p.iso===selected);
+      countryDetail.replaceChildren();
+      const chosenCountry=data.countries[selected];
+      if(chosenCountry){
+        const name=T("h3",chosenCountry.name+" · "+year);
+        name.className="explore-country-name";
+        countryDetail.append(name);
+        const values=T("p",selectedPoint
+          ?data.indicators[xCode]+": "+selectedPoint.x.toFixed(1)+" / 100 · "+
+           data.indicators[yCode]+": "+selectedPoint.y.toFixed(1)+" / 100"
+          :"No paired observations for these two indicators in "+year+". Choose another year or country.");
+        values.className="explore-country-values";
+        countryDetail.append(values);
+        if(selectedPoint){
+          const link=document.createElement("button");
+          link.type="button";
+          link.className="explore-open-country";
+          link.textContent="Open country profile";
+          link.addEventListener("click",()=>onOpenCountry(selected));
+          countryDetail.append(link);
+        }
       }
       line.replaceChildren();
       if(points.length<10){
         line.append(T("p","Insufficient matching observations for "+year+". Choose another year."));
         return;
       }
-      const W=710,H=390, left=58,right=24,top=18,bottom=58;
+      const W=710,H=390,left=58,right=24,top=18,bottom=58;
       const xx=v=>left+(v/100)*(W-left-right);
       const yy=v=>top+((100-v)/100)*(H-top-bottom);
       const plot=S("svg",{
-        viewBox:"0 0 "+W+" "+H,role:"img",
+        viewBox:"0 0 "+W+" "+H,role:"group",
         "aria-label":data.indicators[xCode]+" versus "+data.indicators[yCode]+" in "+year,
         style:"display:block;width:100%;height:auto"
       });
@@ -367,31 +410,50 @@
         plot.append(S("text",{x:xx(tick),y:H-bottom+19,"text-anchor":"middle","font-size":12,fill:"#aac8b8"},tick));
         plot.append(S("text",{x:left-13,y:yy(tick)+5,"text-anchor":"end","font-size":12,fill:"#aac8b8"},tick));
       }
+      // Render selected last, so it is visible and touchable if points overlap.
+      points.sort((a,b)=>Number(a.iso===selected)-Number(b.iso===selected));
       for(const p of points){
+        const active=p.iso===selected;
+        if(active)
+          plot.append(S("circle",{cx:xx(p.x),cy:yy(p.y),r:12,fill:"none",
+            stroke:"#ffd28a","stroke-width":2,"pointer-events":"none"}));
         const circ=S("circle",{
-          cx:xx(p.x),cy:yy(p.y),r:4.8,fill:p.iso==="SWE"?"#edc17d":"#75c9aa",
-          "fill-opacity":0.75,stroke:"#fff","stroke-width":0.7,
-          tabindex:"0",role:"img",
-          "aria-label":p.name+": "+p.x.toFixed(1)+", "+p.y.toFixed(1)
+          cx:xx(p.x),cy:yy(p.y),r:active?7:5.1,
+          fill:active?"#ffd28a":"#75c9aa",
+          "fill-opacity":active?1:.78,
+          stroke:active?"#fff4d8":"#143027","stroke-width":active?1.4:.6,
+          tabindex:"0",role:"button",cursor:"pointer",
+          "aria-label":"Show "+p.name+": "+p.x.toFixed(1)+", "+p.y.toFixed(1)
         });
         circ.append(S("title",{},p.name+" ("+year+"): "+data.indicators[xCode]+" "+p.x.toFixed(1)+"; "+data.indicators[yCode]+" "+p.y.toFixed(1)));
+        circ.addEventListener("click",()=>{
+          countrySelect.value=p.iso;
+          render();
+        });
+        circ.addEventListener("keydown",event=>{
+          if(event.key==="Enter"||event.key===" "){
+            event.preventDefault();
+            countrySelect.value=p.iso;
+            render();
+          }
+        });
         plot.append(circ);
       }
-      const labelX=S("text",{
+      plot.append(S("text",{
         x:W/2,y:H-6,"text-anchor":"middle","font-size":13,fill:"#aac8b8"
-      },data.indicators[xCode]+" (0–100)");
-      const labelY=S("text",{
+      },data.indicators[xCode]+" (0–100)"));
+      plot.append(S("text",{
         x:16,y:H/2,transform:"rotate(-90 16 "+H/2+")",
         "text-anchor":"middle","font-size":13,fill:"#aac8b8"
-      },data.indicators[yCode]+" (0–100)");
-      plot.append(labelX,labelY);
-      const title=T("p",points.length+" countries and territories · "+year);
+      },data.indicators[yCode]+" (0–100)"));
+      const title=T("p",points.length+" countries and territories with paired observations · "+year);
       title.style.fontWeight="700";
-      const caveat=T("p","Source: World Bank WGI, 2026 update. Dots are governance estimates, not precise measurements. Relationships in this chart do not imply causation. Source year: "+year+"; retrieved: "+data.source.retrieved_utc.slice(0,10)+".");
+      const caveat=T("p","Source: World Bank WGI, 2026 update. Scores are governance estimates, not precise measurements. Relationships do not imply causation. Source year: "+year+"; retrieved: "+data.source.retrieved_utc.slice(0,10)+".");
       caveat.style.cssText="font-size:12px;color:#a7c6b5;line-height:1.7";
       line.append(title,plot,caveat);
     }
-    for(const el of [xIndicator,yIndicator,yearSelect])el.addEventListener("change",render);
+    for(const el of [xIndicator,yIndicator,yearSelect,countrySelect])
+      el.addEventListener("change",render);
     render();
   }
 
@@ -462,7 +524,12 @@
     for(const el of cs)el.addEventListener("change",country);
     for(const el of [...ds,comparisonIndicator])el.addEventListener("change",compare);
     country();compare();
-    setupExplore(data);
+    setupExplore(data,iso=>{
+      cs[0].value=iso;
+      country();
+      const countryTab=document.querySelector('[data-tab="countries"]');
+      if(countryTab)countryTab.click();
+    });
     const note=document.querySelector(".note");
     if(note)note.textContent="World Bank WGI 2026: "+list.length+" countries and territories with observations. Six dimensions, scores 0–100. V-Dem and other datasets are not yet integrated.";
   }
