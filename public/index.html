@@ -222,13 +222,28 @@ footer a{color:#9bdcbc;text-underline-offset:3px}
 .vdem-dual-input:disabled::-webkit-slider-thumb{opacity:.45;cursor:not-allowed}
 .vdem-dual-legends{display:flex;justify-content:space-between;gap:15px;margin:0 0 12px;color:#f5dcae;font-size:15px;font-weight:700;font-variant-numeric:tabular-nums}
 .vdem-dual-legends output{display:block}
+
+/* Mondoskopo contact: accessible, no published mailbox address */
+.contact-form{display:flex;flex-direction:column;gap:16px;margin-top:22px;max-width:620px}
+.contact-form label{display:flex;flex-direction:column;gap:8px;color:#f0faf4;font-size:14px;font-weight:650}
+.contact-form label span{color:#c4d8ca;font-weight:450}
+.contact-form input,.contact-form textarea{display:block;width:100%;box-sizing:border-box;min-width:0;background:#213e30;color:#f4fff6;border:1px solid #567963;border-radius:9px;padding:12px 14px;font:inherit;font-size:15px;line-height:1.5}
+.contact-form textarea{resize:vertical;min-height:145px}
+.contact-form input::placeholder,.contact-form textarea::placeholder{color:#b1cdbb}
+.contact-form input:focus-visible,.contact-form textarea:focus-visible{outline:2px solid #91d4b7;outline-offset:2px}
+.contact-form button[type=submit]{align-self:flex-start;border:1px solid #ade4c1;background:#a6e3bd;color:#123120;border-radius:8px;padding:11px 19px;font-size:14px;font-weight:750;cursor:pointer}
+.contact-form button[disabled]{cursor:not-allowed;opacity:.55}
+.contact-status{font-size:13px;color:#d6e9da;line-height:1.6;min-height:20px;margin:0}
+.contact-status[data-state=success]{color:#c4f0cd}
+.contact-privacy{font-size:12px;color:#c3d8cb;line-height:1.7;margin:21px 0 0;max-width:650px}
+.contact-honeypot{position:absolute!important;left:-9999px!important;width:1px;height:1px;overflow:hidden}
 </style>
 </head>
 <body>
 <header><div class="shell"><div class="top"><div class="brand">
 <img src="assets/mondoskopo-globe.webp" alt="" width="100" height="90" decoding="async" />
 <div class="brand-copy"><span class="brand-name">Mondoskopo</span><span class="brand-sub">Observing humanity in motion</span></div></div><div class="tagh">Open data · Independent exploration</div></div>
-<nav aria-label="Main navigation"><button aria-selected="true" data-tab="home">Start</button><button aria-selected="false" data-tab="countries">Countries</button><button aria-selected="false" data-tab="compare">Compare</button><button aria-selected="false" data-tab="explore">Explore</button><button aria-selected="false" data-tab="democracy">Democracy</button><button aria-selected="false" data-tab="connections">Connections</button></nav></div></header>
+<nav aria-label="Main navigation"><button aria-selected="true" data-tab="home">Start</button><button aria-selected="false" data-tab="countries">Countries</button><button aria-selected="false" data-tab="compare">Compare</button><button aria-selected="false" data-tab="explore">Explore</button><button aria-selected="false" data-tab="democracy">Democracy</button><button aria-selected="false" data-tab="connections">Connections</button><button aria-selected="false" data-tab="contact">Contact</button></nav></div></header>
 <main class="shell">
 <section id="home" class="home active">
 <div class="hero"><div><p class="eyebrow">A global telescope for human societies</p><h1>See societies<br>in motion.</h1><p class="intro">Explore how institutions and democratic structures evolve across countries and through time. Compare observations. Question explanations. Follow the evidence.</p>
@@ -258,11 +273,31 @@ footer a{color:#9bdcbc;text-underline-offset:3px}
 <p>Explore how democracy estimates and governance scores vary together across countries and through time. Each source keeps its own scale and attribution.</p>
 <div id="relations-app"><p class="relations-intro">Checking verified observations in both datasets…</p></div>
 </div></section>
+<section class="views" id="contact"><div class="card">
+<p class="eyebrow">GET IN TOUCH</p>
+<h2>Contact Mondoskopo</h2>
+<p>Questions, feedback or ideas about the data and its interpretation are welcome. Your message is sent privately; no recipient email address is displayed on this site.</p>
+<form id="contact-form" class="contact-form" novalidate>
+<label for="contact-name">Name <span>(optional)</span>
+<input id="contact-name" name="name" type="text" autocomplete="name" maxlength="100" placeholder="Your name" />
+</label>
+<label for="contact-email">Your email address
+<input id="contact-email" name="email" type="email" autocomplete="email" maxlength="254" placeholder="name@example.com" required />
+</label>
+<label for="contact-message">Message
+<textarea id="contact-message" name="message" rows="6" minlength="10" maxlength="5000" placeholder="Write your message here…" required></textarea>
+</label>
+<div class="contact-honeypot" aria-hidden="true"><label for="contact-website">Leave this empty</label><input id="contact-website" name="website" tabindex="-1" autocomplete="off" /></div>
+<button type="submit" disabled>Send message</button>
+<p id="contact-status" class="contact-status" role="status" aria-live="polite">Checking message delivery…</p>
+</form>
+<p class="contact-privacy">Your contact details and message are used to receive and answer your enquiry. They are transmitted securely to Mondoskopo's mail account; do not include sensitive personal information. The form does not publish your message or email address.</p>
+</div></section>
 <div class="note">Data status: The website is online. Country-level observations have not yet been published. This is an exploratory platform under development.</div>
 <footer><strong>Sources, methods & privacy</strong><p>Sources: <a href="https://www.worldbank.org/en/publication/worldwide-governance-indicators">World Bank Worldwide Governance Indicators</a> (WGI, CC BY 4.0) and <a href="https://v-dem.net/data/the-v-dem-dataset/">V-Dem Country-Year Core</a> (CC BY-SA 4.0, shown after verified import). They are separate measurement systems; neither directly measures societal resilience or a population's ability to process complexity.</p><p>No advertising or visitor analytics are active in this release.</p></footer>
 </main><script>
 function show(name){document.querySelectorAll('[data-tab]').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.tab===name)));document.querySelectorAll('.home,.views').forEach(s=>s.classList.toggle('active',s.id===name));location.hash=name==='home'?'':name;window.scrollTo({top:0,behavior:'smooth'});}
 document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.tab)));
 document.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.open)));
-const hash=location.hash.slice(1);if(['countries','compare','explore','democracy','connections'].includes(hash))show(hash);
-</script><script src="wgi.js?v=connections-20261107-1" defer></script><script src="vdem.js?v=dual-range-20261107-1" defer></script><script src="relations.js?v=connections-20261107-1" defer></script></body></html>
+const hash=location.hash.slice(1);if(['countries','compare','explore','democracy','connections','contact'].includes(hash))show(hash);
+</script><script src="wgi.js?v=connections-20261107-1" defer></script><script src="vdem.js?v=dual-range-20261107-1" defer></script><script src="relations.js?v=connections-20261107-1" defer></script><script src="contact.js?v=contact-20261107-1" defer></script></body></html>
