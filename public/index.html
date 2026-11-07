@@ -87,6 +87,24 @@ footer a{color:#9bdcbc;text-underline-offset:3px}
 .metric-delta.flat{color:#e1eee6}
 @media(max-width:800px){.metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:480px){.metric-grid{grid-template-columns:1fr 1fr;gap:8px}.metric{padding:12px;min-height:148px}.metric-value{font-size:23px}.country-overview h3{font-size:20px}}
+
+/* Country period controls and comparison of measured WGI score changes */
+.period-controls{display:flex;align-items:flex-end;flex-wrap:wrap;gap:12px;margin:0 0 19px;padding:15px;border:1px solid #365b49;border-radius:13px;background:#182e24}
+.period-controls label{display:flex;flex-direction:column;gap:7px;font-size:13px;color:#d0e5d9;font-weight:650}
+.period-controls select{min-width:115px;padding:10px 35px 10px 12px;border-radius:8px}
+.period-detail{font-size:12px;color:#b4cebe;line-height:1.55;align-self:center;margin-left:4px}
+.period-ranking{margin:24px 0 18px;border:1px solid #335945;border-radius:14px;background:#192e25;padding:20px}
+.period-ranking h4{font-size:19px;font-weight:700;color:#e8f7ed;margin:0 0 9px;letter-spacing:-.015em}
+.period-ranking .overview-intro{margin-bottom:15px}
+.change-list{display:grid;gap:14px;margin:17px 0}
+.change-row{display:grid;grid-template-columns:minmax(145px,1.15fr) minmax(110px,2fr) 65px;align-items:center;gap:13px;min-width:0}
+.change-name{font-size:13px;color:#e4f3e9;line-height:1.35}
+.change-rail{height:13px;border-radius:7px;background:#2f493d;overflow:hidden}
+.change-fill{height:100%;min-width:0;border-radius:7px}
+.change-fill.increase{background:#79c9a6}
+.change-fill.decrease{background:#deb48a}
+.change-number{text-align:right;font-size:14px;color:#e6f2eb;font-variant-numeric:tabular-nums;font-weight:700}
+@media(max-width:580px){.period-controls{padding:12px}.period-detail{width:100%;margin:0}.period-ranking{padding:14px}.change-row{grid-template-columns:minmax(90px,1.05fr) minmax(64px,1fr) 46px;gap:8px}.change-name{font-size:12px}.change-number{font-size:12px}}
 </style>
 </head>
 <body>
@@ -118,4 +136,4 @@ function show(name){document.querySelectorAll('[data-tab]').forEach(b=>b.setAttr
 document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.tab)));
 document.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.open)));
 const hash=location.hash.slice(1);if(['countries','compare','explore'].includes(hash))show(hash);
-</script><script src="wgi.js?v=profile-20261106-3" defer></script></body></html>
+</script><script src="wgi.js?v=period-20261107-1" defer></script></body></html>
