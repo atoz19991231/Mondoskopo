@@ -105,6 +105,26 @@ footer a{color:#9bdcbc;text-underline-offset:3px}
 .change-fill.decrease{background:#deb48a}
 .change-number{text-align:right;font-size:14px;color:#e6f2eb;font-variant-numeric:tabular-nums;font-weight:700}
 @media(max-width:580px){.period-controls{padding:12px}.period-detail{width:100%;margin:0}.period-ranking{padding:14px}.change-row{grid-template-columns:minmax(90px,1.05fr) minmax(64px,1fr) 46px;gap:8px}.change-name{font-size:12px}.change-number{font-size:12px}}
+
+/* Country-pair comparison: same dates, no imputed observations */
+#compare-overview{margin-top:22px}
+.comparison-title{margin:0 0 10px;font-size:21px;font-weight:750;color:#eaf6ed}
+.comparison-intro{font-size:13px;line-height:1.7;color:#bfd5c9;margin:0 0 14px}
+.comparison-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:16px 0}
+.comparison-card{display:block;text-align:left;width:100%;border:1px solid #456958;border-radius:13px;background:#203b30;color:#eaf6ed;padding:17px;cursor:pointer}
+.comparison-card:hover,.comparison-card:focus-visible{background:#284b3c;border-color:#91d5b3}
+.comparison-card[aria-pressed=true]{background:#2a5040;border:2px solid #b8f1ce;padding:16px}
+.comparison-card-heading{display:block;font-size:15px;font-weight:700;color:#edfcf4;margin-bottom:13px}
+.comparison-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.comparison-pair-col{display:flex;flex-direction:column;gap:6px;min-width:0}
+.comparison-country{font-size:13px;color:#d0e5db;overflow-wrap:anywhere}
+.comparison-end{font-size:22px;font-weight:750;line-height:1.2;font-variant-numeric:tabular-nums}
+.comparison-change{font-size:13px;color:#dcebe3;font-variant-numeric:tabular-nums}
+.comparison-gap{display:block;border-top:1px solid #476557;margin-top:15px;padding-top:10px;font-size:13px;color:#bbd7c8;line-height:1.5}
+.comparison-gap strong{color:#e6f4eb}
+.comparison-card .positive{color:#c7f2d8}
+.comparison-card .negative{color:#f1c5a5}
+@media(max-width:660px){.comparison-grid{grid-template-columns:1fr}.comparison-card{padding:14px}}
 </style>
 </head>
 <body>
@@ -127,7 +147,7 @@ footer a{color:#9bdcbc;text-underline-offset:3px}
 <div class="cards" style="grid-template-columns:repeat(auto-fit,minmax(250px,1fr));margin-top:17px"><div class="card"><strong>Observation before conclusion</strong><p>Every indicator should retain its source, scale and reference year. We do not invent a single overall stability score.</p></div><div class="card"><strong>Built to grow</strong><p>Democracy and institutions are the starting point. Other societal dimensions will follow as reliable evidence allows.</p></div></div>
 </section>
 <section class="views" id="countries"><div class="card"><p class="eyebrow">COUNTRY PROFILE</p><h2>Countries through time</h2><p>Choose a country to explore institutional change.</p><div class="formrow"><label>Country<select><option>Sweden</option><option>Poland</option></select></label><label>Indicator<select><option>Rule of law</option><option>Government effectiveness</option><option>Voice and accountability</option></select></label></div><div class="country-overview" id="country-overview" aria-live="polite"></div><div class="plot">Country datasets are being prepared. No indicator values are shown until a documented source has been imported and verified.</div></div></section>
-<section class="views" id="compare"><div class="card"><p class="eyebrow">COUNTRY COMPARISON</p><h2>Compare trajectories</h2><p>Compare the same indicator on the same scale and across the same years.</p><div class="formrow"><label>First country<select><option>Sweden</option><option>Poland</option></select></label><label>Second country<select><option>Poland</option><option>Sweden</option></select></label></div><div class="plot">Comparative charts will become available once the World Bank WGI observations have been imported. We do not use placeholder statistics.</div></div></section>
+<section class="views" id="compare"><div class="card"><p class="eyebrow">COUNTRY COMPARISON</p><h2>Compare trajectories</h2><p>Compare two countries across the same observed years, using each of the six WGI governance dimensions.</p><div class="formrow"><label>First country<select><option>Sweden</option><option>Poland</option></select></label><label>Second country<select><option>Poland</option><option>Sweden</option></select></label></div><div id="compare-overview" aria-live="polite"></div><div class="plot">Comparative charts will become available once the World Bank WGI observations have been imported. We do not use placeholder statistics.</div></div></section>
 <section class="views" id="explore"><div class="card"><p class="eyebrow">GLOBAL LANDSCAPE</p><h2>Explore relationships</h2><p>Explore associations across countries and years without confusing them with causal explanations.</p><div class="plot">Global scatterplots will become available after source datasets are loaded. Current status: awaiting verified observations.</div></div></section>
 <div class="note">Data status: The website is online. Country-level observations have not yet been published. This is an exploratory platform under development.</div>
 <footer><strong>Sources, methods & privacy</strong><p>Planned primary datasets: <a href="https://www.worldbank.org/en/publication/worldwide-governance-indicators">World Bank Worldwide Governance Indicators</a> and <a href="https://v-dem.net/data/the-v-dem-dataset/">V-Dem</a>. These indicators do not directly measure societal resilience or a population's ability to process complexity.</p><p>No advertising or visitor analytics are active in this release.</p></footer>
@@ -136,4 +156,4 @@ function show(name){document.querySelectorAll('[data-tab]').forEach(b=>b.setAttr
 document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.tab)));
 document.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.open)));
 const hash=location.hash.slice(1);if(['countries','compare','explore'].includes(hash))show(hash);
-</script><script src="wgi.js?v=period-20261107-1" defer></script></body></html>
+</script><script src="wgi.js?v=compare-20261107-1" defer></script></body></html>
