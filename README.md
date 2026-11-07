@@ -69,3 +69,11 @@ The Countries view lets visitors choose two actual observation years from the Wo
 The default interval is approximately ten years ending with the most recent available observation. It picks an existing earlier observation rather than inventing a missing year. Each of the six country cards displays the score from the selected end year (or “not available”) and the change in **WGI score points** from the selected start year. The ranking sorts comparable indicators by **absolute** change on the same years; direction is labelled increase/decrease, not good/bad, and absent endpoint data are excluded. The history plot follows the selected interval. No composite governance index or statistical significance inference is generated.
 
 The frontend uses a versioned script URL in `public/index.html` so that after deployment browsers do not silently use an older cached JS bundle.
+
+## Two-country institutional changes
+
+The Compare view offers two country selectors and a **shared** From year / To year. Years must be observed for both economies, preferably across all six WGI governance dimensions. If all six series do not overlap fully, only actual jointly observed years are offered, with unavailable indicator pairs explicitly flagged.
+
+For each of the six indicators, the comparison shows both countries' selected end-year scores and their changes in WGI **score points** between the exact selected years. Cards are ordered by the absolute difference in these changes, calculated as first-country change minus second-country change. This is a difference in historical changes, **not** a ranking of countries, an estimate of causation, or a test of statistical significance. Selecting a card updates the shared historical chart to that dimension.
+
+The selected-year interval is reused in the two-country chart. Source records are not interpolated. Empty endpoints do not become zeroes; only indicators with actual data for the same two years receive numerical change values.
