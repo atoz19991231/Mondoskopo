@@ -139,7 +139,7 @@ cd ~/mondoskopo-deploy/site && git pull --ff-only && python3 -m unittest discove
 
 Create the SMTP token under Proton Mail Settings → All settings → IMAP/SMTP → SMTP tokens. Enter the custom-domain sender address, token, and recipient email **locally** in `/etc/mondoskopo/contact.env`. That file is owned by root, mode 0600 and **must never be copied to GitHub or shared in chat**. Use `sudoedit /etc/mondoskopo/contact.env` or another private terminal editor. The `ops/contact.env.example` file is only a placeholder template.
 
-Before enabling the service, inspect `/etc/caddy/Caddyfile`. Add the exact-match Caddy route from `ops/contact.caddy.snippet` **inside the existing `mondoskopo.org` site block**. Do not blindly replace the current Caddyfile or disrupt existing static files. Validate configuration with `sudo caddy validate --config /etc/caddy/Caddyfile` before `sudo systemctl reload caddy`. The application listens **only on 127.0.0.1:8765**, not a public port.
+After inspecting `/etc/caddy/Caddyfile`, use `sudo python3 ops/install_contact_route.py` to safely install the exact contact paths inside the existing `mondoskopo.org` site block. This installer refuses unexpected site layouts and competing routes, validates a temporary Caddy candidate, backs up the original, and reloads only after validation; it restores the original on a failed reload. It never modifies the contact token or other datasets. The relay listens **only on 127.0.0.1:8765**. Run `curl -fsS https://mondoskopo.org/api/contact/health` to check the route. Remember this health check does not prove SMTP delivery; a real form submission is the last test.
 
 Once the private environment and verified Caddy route exist, start the backend:
 
