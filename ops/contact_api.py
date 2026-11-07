@@ -193,6 +193,10 @@ def main():
     missing = [k for k in required if not os.environ.get(k)]
     if missing:
         raise SystemExit("Contact service requires server-side mail configuration.")
+    if any(os.environ[k].startswith("YOUR_") for k in required):
+        raise SystemExit("Contact service has unconfigured placeholder values.")
+    if not valid_reply_address(os.environ["MONDOSKOPO_SMTP_USER"]) or not valid_reply_address(os.environ["MONDOSKOPO_CONTACT_TO"]):
+        raise SystemExit("Contact sender/recipient must be valid private mail addresses.")
     # Never bind to a public network interface.
     ThreadingHTTPServer((HOST, PORT), ContactHandler).serve_forever()
 
