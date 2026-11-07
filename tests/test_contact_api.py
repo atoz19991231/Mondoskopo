@@ -54,6 +54,7 @@ class ContactValidationTests(unittest.TestCase):
     def setUp(self):
         with contact._lock:
             contact._recent.clear()
+            contact._global_recent.clear()
 
     def test_valid_form_fields(self):
         self.assertEqual(contact.validate(valid())[1], "person@example.org")
