@@ -619,7 +619,7 @@
         " countries and territories with observations. Six dimensions, scores 0–100."+
         (latestYear===null?"":" Latest observation year: "+latestYear+".")+
         " Retrieved: "+data.source.retrieved_utc.slice(0,10)+
-        ". V-Dem observations, when published, appear separately under Democracy.";
+        ". V-Dem observations appear under Democracy, and paired V-Dem/WGI observations under Connections.";
     }
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",setup);
