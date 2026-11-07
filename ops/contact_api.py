@@ -22,13 +22,15 @@ from urllib.parse import urlsplit
 
 HOST = "127.0.0.1"
 PORT = 8765
-MAX_BYTES = 12_288
+MAX_BYTES = 24_576
 ORIGINS = {"https://mondoskopo.org", "https://www.mondoskopo.org"}
 EMAIL_RE = re.compile(r"^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$")
 TIME_WINDOW = 3600
 MAX_PER_HOUR = 6
+GLOBAL_MAX_PER_HOUR = 80
 MIN_SECONDS_BETWEEN = 25
 _recent: dict[str, deque[float]] = defaultdict(deque)
+_global_recent: deque[float] = deque()
 _lock = threading.Lock()
 
 
@@ -66,12 +68,17 @@ def allow_send(ip: str, now: float | None = None) -> bool:
         history = _recent[ip]
         while history and now - history[0] > TIME_WINDOW:
             history.popleft()
+        while _global_recent and now - _global_recent[0] > TIME_WINDOW:
+            _global_recent.popleft()
+        if len(_global_recent) >= GLOBAL_MAX_PER_HOUR:
+            return False
         if len(history) >= MAX_PER_HOUR:
             return False
         if history and now - history[-1] < MIN_SECONDS_BETWEEN:
             return False
         # Reserve one slot before trying SMTP to limit abuse under concurrency.
         history.append(now)
+        _global_recent.append(now)
         if len(_recent) > 2048:
             for key in list(_recent):
                 if not _recent[key] or now - _recent[key][-1] > TIME_WINDOW:
